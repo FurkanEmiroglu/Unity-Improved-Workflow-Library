@@ -1,0 +1,23 @@
+{
+  "name": "com.furkanemiroglu.improvedworkflow",
+  "displayName": "Improved Workflow Package for Unity",
+  "version": "1.0.0",
+  "unity": "2021.3",
+  "description": "Improved Workflow is a library that contains useful extensions, utilities & implementations that will boost your workflow in Unity.",
+  "category": "FurkanEmiroglu",
+  "documentationUrl": "https://github.com/FurkanEmiroglu/Unity-Improved-Workflow-Library/blob/main/README.md",
+  "changelogUrl": "https://github.com/FurkanEmiroglu/Unity-Improved-Workflow-Library",
+  "licensesUrl": "https://github.com/FurkanEmiroglu/Unity-Improved-Workflow-Library",
+  "author": {
+    "name": "Furkan Emiroğlu",
+    "email": "emiroglu.furkan@gmail.com",
+    "url": "https://github.com/FurkanEmiroglu/Unity-Improved-Workflow-Library"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/FurkanEmiroglu"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FurkanEmiroglu/Unity-Improved-Workflow-Library.git"
+  }
+}

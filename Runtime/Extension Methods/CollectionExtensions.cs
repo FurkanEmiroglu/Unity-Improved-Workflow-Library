@@ -3,8 +3,17 @@ using UnityEngine;
 
 namespace ImprovedWorkflow.Extensions
 {
+    /// <summary>
+    /// Contains extension methods for collections.
+    /// </summary>
     public static class CollectionExtensions
     {
+        /// <summary>
+        /// Removes the last item from the list and returns it.
+        /// </summary>
+        /// <param name="t">A generic list to pop an item</param>
+        /// <typeparam name="T">Generic Type</typeparam>
+        /// <returns>Popped item</returns>
         public static T Pop<T>(this List<T> t)
         {
             T lastItem = t[^1];
@@ -12,6 +21,12 @@ namespace ImprovedWorkflow.Extensions
             return lastItem;
         }
 
+        /// <summary>
+        /// Removes the first item from the list and returns it.
+        /// </summary>
+        /// <param name="t">A generic list to Dequeue an item</param>
+        /// <typeparam name="T">Generic Type</typeparam>
+        /// <returns>Dequeued item</returns>
         public static T Dequeue<T>(this List<T> t)
         {
             T firstItem = t[0];
@@ -19,18 +34,40 @@ namespace ImprovedWorkflow.Extensions
             return firstItem;
         }
 
+        /// <summary>
+        /// Picks a random item from the list and returns it. Item still remains in the list.
+        /// You can remove it by passing true to removeFromList parameter.
+        /// </summary>
+        /// <param name="t">A generic list to get a random item from</param>
+        /// <typeparam name="T">Generic Type</typeparam>
+        /// <returns>Randomly picked item</returns>
         public static T GetRandom<T>(this IList<T> t)
         {
             return t[Random.Range(0, t.Count)];
         }
 
+        /// <summary>
+        /// Picks a random item from the list and returns it. Item will be removed form the list based on the
+        /// removeFormList parameter.
+        /// </summary>
+        /// <param name="t">A generic list to get a random item from</param>
+        /// <param name="removeFromList">should item stay in the list after returning</param>
+        /// <typeparam name="T">Generic Type</typeparam>
+        /// <returns>Randomly picked item</returns>
         public static T GetRandom<T>(this IList<T> t, bool removeFromList)
         {
             T randomItem = GetRandom(t);
             if (removeFromList) t.Remove(randomItem);
             return randomItem;
         }
-        
+        /// <summary>
+        /// Picks a weighted randomized item from the list and returns it. The item will remain in the list.
+        /// </summary>
+        /// <param name="items">Collection to pick from</param>
+        /// <param name="weights">Weights corresponding to items</param>
+        /// <typeparam name="T">Generic Type</typeparam>
+        /// <returns>Picked item</returns>
+        /// <exception cref="Exception"></exception>
         public static T GetWeightedRandom<T>(IList<T> items, IList<float> weights)
         {
             if (items == null || weights == null || items.Count == 0 || items.Count != weights.Count)
@@ -60,6 +97,13 @@ namespace ImprovedWorkflow.Extensions
             throw new System.Exception("Weights must sum to a positive value");
         }
         
+        /// <summary>
+        /// Removes a random item from the list and returns it.
+        /// </summary>
+        /// <param name="list">Collection to remove randomized item</param>
+        /// <typeparam name="T">Generic type</typeparam>
+        /// <returns>Removed item</returns>
+        /// <exception cref="IndexOutOfRangeException"></exception>
         public static T RemoveRandom<T>(this IList<T> list)
         {
             if (list.Count == 0) throw new System.IndexOutOfRangeException("Cannot remove a random item from an empty list");
@@ -69,6 +113,11 @@ namespace ImprovedWorkflow.Extensions
             return item;
         }
         
+        /// <summary>
+        /// Shuffles a list based on the Fisher-Yates algorithm.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <typeparam name="T"></typeparam>
         public static void Shuffle<T>(IList<T> list)
         {
             System.Random rng = new System.Random();

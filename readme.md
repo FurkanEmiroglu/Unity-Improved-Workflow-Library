@@ -1,3 +1,1 @@
-### Some util classes & extensions.
-
-*No dependencies*
+### Still in progress.

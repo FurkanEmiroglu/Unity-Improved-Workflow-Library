@@ -45,30 +45,6 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         }
 
         /// <summary>
-        ///     Purpose: Creates a box collider that sized in bounds of child mesh and centered, for the parent game object
-        ///     Shortcut : Ctrl + Shift + .
-        /// </summary>
-        [MenuItem("Workflow/Editor Shortcuts/Create collider %#.")]
-        public static void CreateCollider()
-        {
-            Transform[] transforms = Selection.transforms;
-
-            foreach (Transform transform in transforms)
-                if (transform.GetComponentInChildren<MeshFilter>() != null)
-                {
-                    Mesh mesh = transform.GetComponentInChildren<MeshFilter>().sharedMesh;
-                    BoxCollider boxCollider = transform.gameObject.AddComponent<BoxCollider>();
-                    boxCollider.size = mesh.bounds.size;
-                    boxCollider.center = mesh.bounds.center;
-                    Debug.Log("Collider added");
-                }
-                else
-                {
-                    Debug.LogWarning("No mesh filters in children");
-                }
-        }
-
-        /// <summary>
         ///     Purpose: Collapses all components in the inspector
         ///     Shortcut : Shift + b
         /// </summary>

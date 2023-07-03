@@ -210,37 +210,24 @@ namespace ImprovedWorkflow.SceneTools
             m_circleCount = Max(0, m_circleCount);
         }
 
-        private async void ClearLast()
+        private void ClearLast()
         {
-            for (int i = 0; i < m_lastItems.Count; i++)
-            {
-                await Task.Yield();
-                DestroyImmediate(m_allItems[i]);
-            }
-            
             if (m_lastParent != null) DestroyImmediate(m_lastParent);
             m_lastItems.Clear();
         }
 
-        private async void ClearAll()
+        private void ClearAll()
         {
-            for (int i = 0; i < m_allItems.Count; i++)
-            {
-                await Task.Yield();
-                DestroyImmediate(m_allItems[i]);
-            }
-
             m_allItems.Clear();
             m_lastItems.Clear();
             if (m_lastParent != null) DestroyImmediate(m_lastParent);
             
             GameObject[] parents = GameObject.FindObjectsOfType<Transform>().Where(x => x.name.Contains(m_parentName)).Select(x => x
-            .gameObject)
-            .ToArray();
+                                                 .gameObject)
+                                             .ToArray();
 
             for (int i = 0; i < parents.Length; i++)
             {
-                Task.Yield();
                 DestroyImmediate(parents[i].gameObject);
             }
         }

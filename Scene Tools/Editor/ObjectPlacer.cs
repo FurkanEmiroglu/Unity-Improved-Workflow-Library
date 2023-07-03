@@ -8,15 +8,15 @@ using static UnityEngine.Mathf;
 
 namespace ImprovedWorkflow.SceneTools
 {
-    public class LevelDesignTool : EditorWindow
+    public class ObjectPlacer : EditorWindow
     {
         #region Opener
 
-        [MenuItem("Workflow/Scene Tools/Prefab Placer #z")]
+        [MenuItem("Workflow/Scene Tools/Object Placer #z")]
         private static void OpenWindow()
         {
-            var window = GetWindow<LevelDesignTool>();
-            window.titleContent = new GUIContent("Level Design Tool");
+            var window = GetWindow<ObjectPlacer>();
+            window.titleContent = new GUIContent("Object Placing Tool");
             window.Show();
         }
 
@@ -112,7 +112,7 @@ namespace ImprovedWorkflow.SceneTools
             switch (m_levelDesignMode)
             {
                 case LevelDesignMode.Circular:
-                    m_scrollPos = EditorGUILayout.BeginScrollView(m_scrollPos, GUILayout.Height(500));
+                    m_scrollPos = EditorGUILayout.BeginScrollView(m_scrollPos, GUILayout.Height(250));
                     EditorGUI.BeginChangeCheck();
                     
                     m_circleCount = EditorGUILayout.IntField("Circle Count", m_circleCount);

@@ -12,7 +12,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ImprovedWorkflow.EditorTools
+namespace ImprovedWorkflow.UnityEditorExtensions
 {
     public class ScriptableObjectCreator : OdinMenuEditorWindow
     {

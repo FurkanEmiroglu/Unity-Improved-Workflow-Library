@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace ImprovedWorkflow.EditorTools
+namespace ImprovedWorkflow.UnityEditorExtensions
 {
     internal static class ReflectionExtensions
     {

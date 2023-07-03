@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-namespace ImprovedWorkflow.Extensions
+namespace ImprovedWorkflow.CSharpExtensions
 {
     /// <summary>
-    /// Contains extension methods for collections.
+    ///     Contains extension methods for collections.
     /// </summary>
     public static class CollectionExtensions
     {
         /// <summary>
-        /// Removes the last item from the list and returns it.
+        ///     Removes the last item from the list and returns it.
         /// </summary>
         /// <param name="t">A generic list to pop an item</param>
         /// <typeparam name="T">Generic Type</typeparam>
@@ -22,7 +24,7 @@ namespace ImprovedWorkflow.Extensions
         }
 
         /// <summary>
-        /// Removes the first item from the list and returns it.
+        ///     Removes the first item from the list and returns it.
         /// </summary>
         /// <param name="t">A generic list to Dequeue an item</param>
         /// <typeparam name="T">Generic Type</typeparam>
@@ -35,8 +37,8 @@ namespace ImprovedWorkflow.Extensions
         }
 
         /// <summary>
-        /// Picks a random item from the list and returns it. Item still remains in the list.
-        /// You can remove it by passing true to removeFromList parameter.
+        ///     Picks a random item from the list and returns it. Item still remains in the list.
+        ///     You can remove it by passing true to removeFromList parameter.
         /// </summary>
         /// <param name="t">A generic list to get a random item from</param>
         /// <typeparam name="T">Generic Type</typeparam>
@@ -47,8 +49,8 @@ namespace ImprovedWorkflow.Extensions
         }
 
         /// <summary>
-        /// Picks a random item from the list and returns it. Item will be removed form the list based on the
-        /// removeFormList parameter.
+        ///     Picks a random item from the list and returns it. Item will be removed form the list based on the
+        ///     removeFormList parameter.
         /// </summary>
         /// <param name="t">A generic list to get a random item from</param>
         /// <param name="removeFromList">should item stay in the list after returning</param>
@@ -60,8 +62,9 @@ namespace ImprovedWorkflow.Extensions
             if (removeFromList) t.Remove(randomItem);
             return randomItem;
         }
+
         /// <summary>
-        /// Picks a weighted randomized item from the list and returns it. The item will remain in the list.
+        ///     Picks a weighted randomized item from the list and returns it. The item will remain in the list.
         /// </summary>
         /// <param name="items">Collection to pick from</param>
         /// <param name="weights">Weights corresponding to items</param>
@@ -76,10 +79,7 @@ namespace ImprovedWorkflow.Extensions
             double totalWeight = 0;
             foreach (double weight in weights)
             {
-                if (weight < 0)
-                {
-                    Debug.Log("weight cant be negative");
-                }
+                if (weight < 0) Debug.Log("weight cant be negative");
                 totalWeight += weight;
             }
 
@@ -88,17 +88,14 @@ namespace ImprovedWorkflow.Extensions
             for (int i = 0; i < items.Count; i++)
             {
                 randomValue -= weights[i];
-                if (randomValue <= 0)
-                {
-                    return items[i];
-                }
+                if (randomValue <= 0) return items[i];
             }
-            
-            throw new System.Exception("Weights must sum to a positive value");
+
+            throw new Exception("Weights must sum to a positive value");
         }
-        
+
         /// <summary>
-        /// Removes a random item from the list and returns it.
+        ///     Removes a random item from the list and returns it.
         /// </summary>
         /// <param name="list">Collection to remove randomized item</param>
         /// <typeparam name="T">Generic type</typeparam>
@@ -106,21 +103,21 @@ namespace ImprovedWorkflow.Extensions
         /// <exception cref="IndexOutOfRangeException"></exception>
         public static T RemoveRandom<T>(this IList<T> list)
         {
-            if (list.Count == 0) throw new System.IndexOutOfRangeException("Cannot remove a random item from an empty list");
-            int index = UnityEngine.Random.Range(0, list.Count);
+            if (list.Count == 0) throw new IndexOutOfRangeException("Cannot remove a random item from an empty list");
+            int index = Random.Range(0, list.Count);
             T item = list[index];
             list.RemoveAt(index);
             return item;
         }
-        
+
         /// <summary>
-        /// Shuffles a list based on the Fisher-Yates algorithm.
+        ///     Shuffles a list based on the Fisher-Yates algorithm.
         /// </summary>
         /// <param name="list"></param>
         /// <typeparam name="T"></typeparam>
         public static void Shuffle<T>(IList<T> list)
         {
-            System.Random rng = new System.Random();
+            System.Random rng = new();
             int n = list.Count;
             while (n > 1)
             {

@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace ImprovedWorkflow.EditorTools
+namespace ImprovedWorkflow.UnityEditorExtensions
 {
     public static class EditorShortcuts
     {

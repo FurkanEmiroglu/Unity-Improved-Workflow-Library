@@ -1,16 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ImprovedWorkflow.Extensions;
-using ImprovedWorkflow.UtilClasses;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Task = System.Threading.Tasks.Task;
 
 using static UnityEngine.Mathf;
 
-namespace GameCore
+namespace ImprovedWorkflow.SceneTools
 {
     public class LevelDesignTool : EditorWindow
     {

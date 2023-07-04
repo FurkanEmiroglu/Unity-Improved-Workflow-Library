@@ -32,8 +32,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
         internal static object CallMethod(this Type type, string method, params object[] parameters)
         {
-            return type.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-                       .Invoke(null, parameters);
+            return type.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, parameters);
         }
 
         internal static object CallMethod(this object obj, string method, params object[] parameters)
@@ -113,7 +112,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         private float m_resolutionMultiplier = 1f;
         //private static EditorWindow GameView { get { return (EditorWindow) GetType( "GameView" ).CallMethod( "GetMainGameView" ); } }
 
-        private List<Vector2> m_resolutions = new() { new(1024, 768) }; // Not readonly to support serialization
+        private List<Vector2> m_resolutions = new() { new Vector2(1024, 768) }; // Not readonly to support serialization
         private List<bool> m_resolutionsEnabled = new() { true }; // Same as above
         private bool m_saveAsPNG = true;
         private string m_saveDirectory;
@@ -252,8 +251,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
                 if (m_captureOverlayUI && EditorApplication.isPlaying)
                 {
                     EditorGUI.indentLevel++;
-                    m_setTimeScaleToZero =
-                        EditorGUILayout.ToggleLeft("Set timeScale to 0 during capture", m_setTimeScaleToZero);
+                    m_setTimeScaleToZero = EditorGUILayout.ToggleLeft("Set timeScale to 0 during capture", m_setTimeScaleToZero);
                     EditorGUI.indentLevel--;
                 }
             }
@@ -262,8 +260,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
             if (m_saveAsPNG && !m_captureOverlayUI && m_targetCamera == TargetCamera.GameView)
             {
                 EditorGUI.indentLevel++;
-                m_allowTransparentBackground =
-                    EditorGUILayout.ToggleLeft("Allow transparent background", m_allowTransparentBackground);
+                m_allowTransparentBackground = EditorGUILayout.ToggleLeft("Allow transparent background", m_allowTransparentBackground);
                 if (m_allowTransparentBackground)
                     EditorGUILayout.HelpBox(
                         "For transparent background to work, you may need to disable post-processing on the Main Camera.",
@@ -284,7 +281,8 @@ namespace ImprovedWorkflow.UnityEditorExtensions
                     m_saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
                 if (m_currentResolutionEnabled)
-                    CaptureScreenshot((m_targetCamera == TargetCamera.GameView ? Camera.main : SceneView.lastActiveSceneView.camera).pixelRect.size);
+                    CaptureScreenshot((m_targetCamera == TargetCamera.GameView ? Camera.main : SceneView.lastActiveSceneView.camera)
+                                      .pixelRect.size);
 
                 for (int i = 0; i < m_resolutions.Count; i++)
                     if (m_resolutionsEnabled[i])
@@ -464,8 +462,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
                 screenshot.Apply(false, false);
 
-                File.WriteAllBytes(GetUniqueFilePath(width, height),
-                    m_saveAsPNG ? screenshot.EncodeToPNG() : screenshot.EncodeToJPG(100));
+                File.WriteAllBytes(GetUniqueFilePath(width, height), m_saveAsPNG ? screenshot.EncodeToPNG() : screenshot.EncodeToJPG(100));
             }
             finally
             {
@@ -561,8 +558,8 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
             public CustomResolution(int width, int height)
             {
-                this.Width = width;
-                this.Height = height;
+                Width = width;
+                Height = height;
             }
 
             public bool IsActive
@@ -581,8 +578,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
                             object customSize = GetFixedResolution(Width, Height);
                             SizeHolder.CallMethod("AddCustomSize", customSize);
-                            m_newIndex = (int)SizeHolder.CallMethod("IndexOf", customSize) +
-                                       (int)SizeHolder.CallMethod("GetBuiltinCount");
+                            m_newIndex = (int)SizeHolder.CallMethod("IndexOf", customSize) + (int)SizeHolder.CallMethod("GetBuiltinCount");
                             resolutionIndex = m_newIndex;
                         }
                         else

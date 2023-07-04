@@ -23,21 +23,12 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
             EditorGUILayout.BeginHorizontal();
             GUI.color = Color.gray;
-            if (GUILayout.Button("Reset Position"))
-            {
-                m_targetTransform.localPosition = Vector3.zero;
-            }
+            if (GUILayout.Button("Reset Position")) m_targetTransform.localPosition = Vector3.zero;
 
-            if (GUILayout.Button("Reset Rotation"))
-            {
-                m_targetTransform.localRotation = Quaternion.identity;
-            }
+            if (GUILayout.Button("Reset Rotation")) m_targetTransform.localRotation = Quaternion.identity;
 
-            if (GUILayout.Button("Reset Scale"))
-            {
-                m_targetTransform.localScale = Vector3.one;
-            }
-            
+            if (GUILayout.Button("Reset Scale")) m_targetTransform.localScale = Vector3.one;
+
             EditorGUILayout.EndHorizontal();
         }
     }

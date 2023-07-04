@@ -11,10 +11,14 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         /// <summary>
         ///     Opens terminal in current directory
         /// </summary>
-        [MenuItem("Assets/Open Terminal...", priority = -10000)]
+        [MenuItem("Assets/Open Terminal", priority = -10000)]
         private static void OpenTerminal()
         {
+#if UNITY_EDITOR_WIN
             Process process = Process.Start("wt.exe");
+#elif UNITY_EDITOR_OSX
+            Process.Start("open", "-a Terminal");
+#endif
         }
 
         /// <summary>
@@ -72,11 +76,21 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         ///     Purpose: Clears the player prefs
         ///     Shortcut : Shift + p
         /// </summary>
-        [MenuItem("Workflow/Editor Shortcuts/Clear player prefs #p")]
+        [MenuItem("Workflow/Editor Shortcuts/Clear Player prefs #p")]
         public static void ClearPlayerPrefs()
         {
             PlayerPrefs.DeleteAll();
             Debug.Log("Cleared all player prefs");
+        }
+        
+#if UNITY_EDITOR_WIN
+        [MenuItem("Workflow/Editor Shortcuts/Object Preview #a")]
+#elif UNITY_EDITOR_OSX
+        [MenuItem("Workflow/Editor Shortcuts/Object Preview #a")]
+#endif
+        public static void OpenPreview()
+        {
+            ObjectPreviewer.Init();
         }
     }
 }

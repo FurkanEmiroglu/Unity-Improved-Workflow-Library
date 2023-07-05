@@ -4,7 +4,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace ImprovedWorkflow.EditorTools.RayfireExtensions
+namespace ImprovedWorkflow.RayfireExtensions
 {
     public class RayfireShatterExtension : EditorWindow
     {

@@ -6,7 +6,7 @@ using Task = System.Threading.Tasks.Task;
 
 using static UnityEngine.Mathf;
 
-namespace ImprovedWorkflow.SceneTools
+namespace ImprovedWorkflow.UnityEditorExtensions
 {
     public class ObjectPlacer : EditorWindow
     {

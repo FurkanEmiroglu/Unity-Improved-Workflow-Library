@@ -1,7 +1,7 @@
 ﻿#if CINEMACHINE
 using UnityEngine;
 
-namespace ImprovedWorkflow.EditorTools.CinemachineExtensions
+namespace ImprovedWorkflow.CinemachineExtensions
 {
     public class CameraTarget : MonoBehaviour
     {

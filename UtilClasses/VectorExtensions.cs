@@ -2,7 +2,7 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace ImprovedWorkflow.CSharpExtensions
+namespace ImprovedWorkflow.UtilClasses
 {
     public static class VectorExtensions
     {

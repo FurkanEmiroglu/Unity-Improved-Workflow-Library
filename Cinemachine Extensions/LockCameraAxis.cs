@@ -2,7 +2,7 @@
 using Cinemachine;
 using UnityEngine;
 
-namespace ImprovedWorkflow.EditorTools.CinemachineExtensions
+namespace ImprovedWorkflow.CinemachineExtensions
 {
     [ExecuteInEditMode][SaveDuringPlay][AddComponentMenu("")]
 

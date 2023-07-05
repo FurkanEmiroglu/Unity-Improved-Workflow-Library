@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ImprovedWorkflow.ObjectPooler
+namespace ImprovedWorkflow.UtilClasses
 {
     public abstract class PoolBase<T> : MonoBehaviour where T : MonoBehaviour
     {

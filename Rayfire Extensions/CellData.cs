@@ -1,7 +1,7 @@
 ﻿#if RAYFIRE
 using UnityEngine;
 
-namespace ImprovedWorkflow.EditorTools.RayfireExtensions
+namespace ImprovedWorkflow.RayfireExtensions
 {
     [System.Serializable]
     public struct CellData

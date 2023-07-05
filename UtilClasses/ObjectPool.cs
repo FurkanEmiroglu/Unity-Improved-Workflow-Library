@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ImprovedWorkflow.ObjectPooler
+namespace ImprovedWorkflow.UtilClasses
 {
     /// <summary>
     /// A generic object pooling implementation for MonoBehaviours.

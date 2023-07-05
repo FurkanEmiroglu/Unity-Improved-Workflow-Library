@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-namespace ImprovedWorkflow.SceneTools
+namespace ImprovedWorkflow.UnityEditorExtensions
 {
     public class LightingHelper : EditorWindow
     {

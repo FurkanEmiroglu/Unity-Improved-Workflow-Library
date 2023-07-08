@@ -2,11 +2,11 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace ImprowedWorkflow.UnityEditorExtensions
 {
-    [CustomEditor(typeof(Transform))]
-    [CanEditMultipleObjects]
-    public sealed class CustomTransformEditor : Editor
+    [CustomEditor(typeof(Transform))][CanEditMultipleObjects]
+
+    public class CustomTransformInspector : Editor
     {
         private Editor m_editor;
         private Transform m_targetTransform;
@@ -21,7 +21,6 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         {
             if (m_editor == null) return;
             if (m_targetTransform == null) return;
-
             m_editor.OnInspectorGUI();
 
             EditorGUILayout.BeginHorizontal();

@@ -19,6 +19,9 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 
         public override void OnInspectorGUI()
         {
+            if (m_editor == null) return;
+            if (m_targetTransform == null) return;
+
             m_editor.OnInspectorGUI();
 
             EditorGUILayout.BeginHorizontal();

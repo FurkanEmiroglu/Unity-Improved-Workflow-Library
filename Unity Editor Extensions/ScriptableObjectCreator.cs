@@ -23,7 +23,16 @@ namespace ImprovedWorkflow.UnityEditorExtensions
                 IEnumerable<Type> temp = AssemblyUtilities.GetTypes(AssemblyTypeFlags.CustomTypes).Where(t =>
                     t.IsClass && typeof(ScriptableObject).IsAssignableFrom(t) &&
                     !typeof(EditorWindow).IsAssignableFrom(t) && !typeof(UnityEditor.Editor).IsAssignableFrom(t));
-                return (HashSet<Type>)GetHashSet(temp);
+
+                HashSet<Type> gameCoreTemp = new HashSet<Type>();
+                foreach (Type t in temp)
+                {
+                    if (t.Namespace != null && t.Namespace.Contains("GameCore"))
+                    {
+                        gameCoreTemp.Add(t);
+                    }
+                }
+                return (HashSet<Type>)GetHashSet(gameCoreTemp);
             }
         }
 
@@ -33,7 +42,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
             return new HashSet<T>(source);
         }
 
-        [MenuItem("Assets/Create Scriptable Object...", priority = -10000)]
+        [MenuItem("Assets/Create Scriptable Object", priority = -10000)]
         private static void ShowDialog()
         {
             string path = "Assets";

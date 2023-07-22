@@ -1,25 +1,25 @@
-﻿#if CINEMACHINE
+﻿#if IW_CINEMACHINE_EXTENSIONS
 using Cinemachine;
 using UnityEngine;
 
-namespace ImprovedWorkflow.CinemachineExtensions
+namespace IW.CinemachineExtensions
 {
     [ExecuteInEditMode][SaveDuringPlay][AddComponentMenu("")]
 
     public class LockCameraAxis : CinemachineExtension
     {
         [SerializeField]
-        private LockedAxis lockedAxis;
+        private LockedAxis m_lockedAxis;
 
         [SerializeField]
-        private float lockedPosition;
+        private float m_lockedPosition;
 
         protected override void PostPipelineStageCallback(CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
         {
             if (stage == CinemachineCore.Stage.Body)
             {
                 var pos = state.RawPosition;
-                pos = LockPosition(lockedAxis, pos);
+                pos = LockPosition(m_lockedAxis, pos);
                 state.RawPosition = pos;
             }
         }
@@ -29,13 +29,13 @@ namespace ImprovedWorkflow.CinemachineExtensions
             switch (axis)
             {
                 case LockedAxis.X:
-                    position.x = lockedPosition;
+                    position.x = m_lockedPosition;
                     break;
                 case LockedAxis.Y:
-                    position.y = lockedPosition;
+                    position.y = m_lockedPosition;
                     break;
                 case LockedAxis.Z:
-                    position.z = lockedPosition;
+                    position.z = m_lockedPosition;
                     break;
             }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace IW.EditorExtensions
 {
     public class LightingHelper : EditorWindow
     {
@@ -50,7 +50,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
                     ReplaceLights();
         }
 
-        [MenuItem("Workflow/Scene Tools/Lighting Helper", false, 1)]
+        [MenuItem("Tools/Workflow/Scene Tools/Lighting Helper", false, 1)]
         private static void Init()
         {
             LightingHelper window = (LightingHelper)GetWindow(typeof(LightingHelper));

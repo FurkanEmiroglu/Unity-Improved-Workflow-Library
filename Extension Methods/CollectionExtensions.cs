@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.ExtensionMethods
 {
     /// <summary>
     ///     Contains extension methods for collections.

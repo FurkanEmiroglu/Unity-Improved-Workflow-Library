@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.UtilClasses
 {
     public static class Helpers
     {
@@ -44,8 +44,7 @@ namespace ImprovedWorkflow.UtilClasses
         /// <returns>World position of an ui element</returns>
         public static Vector3 GetWorldPositionOfCanvasElement(RectTransform element, Camera camera)
         {
-            RectTransformUtility.ScreenPointToWorldPointInRectangle(element, element.position, camera,
-                out Vector3 result);
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(element, element.position, camera, out Vector3 result);
             return result;
         }
 
@@ -59,8 +58,7 @@ namespace ImprovedWorkflow.UtilClasses
         public static Vector3 NearestPoint(Vector3 lineStart, Vector3 lineEnd, Vector3 point)
         {
             Vector3 lineDirection = Vector3.Normalize(lineEnd - lineStart);
-            float closestPoint = Vector3.Dot(point - lineStart, lineDirection) /
-                                 Vector3.Dot(lineDirection, lineDirection);
+            float closestPoint = Vector3.Dot(point - lineStart, lineDirection) / Vector3.Dot(lineDirection, lineDirection);
             return lineStart + closestPoint * lineDirection;
         }
 

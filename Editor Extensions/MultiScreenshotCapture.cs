@@ -6,7 +6,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace IW.EditorExtensions
 {
     internal static class ReflectionExtensions
     {
@@ -310,7 +310,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
             EditorGUILayout.EndScrollView();
         }
 
-        [MenuItem("Workflow/Multi Screenshot Capture", false, 2)]
+        [MenuItem("Tools/Workflow/Multi Screenshot Capture", false, 2)]
         private static void Init()
         {
             MultiScreenshotCapture window = GetWindow<MultiScreenshotCapture>();

@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
-//#define ODIN_INSPECTOR
-#if ODIN_INSPECTOR
+#if IW_ODIN_INSPECTOR_EXTENSIONS
+
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
@@ -12,7 +12,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace IW.EditorExtensions
 {
     public class ScriptableObjectCreator : OdinMenuEditorWindow
     {

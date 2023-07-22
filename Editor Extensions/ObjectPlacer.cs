@@ -6,13 +6,13 @@ using Task = System.Threading.Tasks.Task;
 
 using static UnityEngine.Mathf;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace IW.EditorExtensions
 {
     public class ObjectPlacer : EditorWindow
     {
         #region Opener
 
-        [MenuItem("Workflow/Scene Tools/Object Placer #z")]
+        [MenuItem("Tools/Workflow/Scene Tools/Object Placer #z")]
         private static void OpenWindow()
         {
             var window = GetWindow<ObjectPlacer>();

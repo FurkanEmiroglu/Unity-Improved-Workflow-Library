@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.ExtensionMethods
 {
     public static class NumericalExtensions
     {

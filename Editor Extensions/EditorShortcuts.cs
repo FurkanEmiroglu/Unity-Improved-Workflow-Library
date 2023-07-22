@@ -4,7 +4,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace ImprovedWorkflow.UnityEditorExtensions
+namespace IW.EditorExtensions
 {
     public static class EditorShortcuts
     {
@@ -26,7 +26,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         ///     Shortcut : Shift + e
         /// </summary>
         /// <returns></returns>
-        [MenuItem("Workflow/Editor Shortcuts/Set Editor Play Mode #e")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Set Editor Play Mode #e")]
         public static void SetEditorPlayMode()
         {
             EditorSettings.enterPlayModeOptionsEnabled = !EditorSettings.enterPlayModeOptionsEnabled;
@@ -41,7 +41,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         ///     Purpose: Locks the current inspector
         ///     Shortcut : ctrl + w
         /// </summary>
-        [MenuItem("Workflow/Editor Shortcuts/Lock Inspector #w")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Lock Inspector #w")]
         public static void LockActiveInspector()
         {
             ActiveEditorTracker.sharedTracker.isLocked = !ActiveEditorTracker.sharedTracker.isLocked;
@@ -52,7 +52,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         ///     Purpose: Collapses all components in the inspector
         ///     Shortcut : Shift + b
         /// </summary>
-        [MenuItem("Workflow/Editor Shortcuts/Collapse Components #b")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Collapse Components #b")]
         public static void CollapseComponents()
         {
             SetAllInspectorsExpanded(false);
@@ -76,7 +76,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
         ///     Purpose: Clears the player prefs
         ///     Shortcut : Shift + p
         /// </summary>
-        [MenuItem("Workflow/Editor Shortcuts/Clear Player prefs #p")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Clear Player prefs #p")]
         public static void ClearPlayerPrefs()
         {
             PlayerPrefs.DeleteAll();
@@ -86,7 +86,7 @@ namespace ImprovedWorkflow.UnityEditorExtensions
 #if UNITY_EDITOR_WIN
         [MenuItem("Workflow/Editor Shortcuts/Object Preview #a")]
 #elif UNITY_EDITOR_OSX
-        [MenuItem("Workflow/Editor Shortcuts/Object Preview #a")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Object Preview #a")]
 #endif
         public static void OpenPreview()
         {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using static UnityEngine.Debug;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.UtilClasses
 {
     public static class TerminalUtilities
     {

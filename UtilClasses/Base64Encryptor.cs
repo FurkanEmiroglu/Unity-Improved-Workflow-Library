@@ -1,4 +1,4 @@
-﻿namespace ImprovedWorkflow.UtilClasses
+﻿namespace IW.UtilClasses
 {
 	public static class Base64Encryptor
 	{

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.UtilClasses
 {
     public class PlayerPrefsX
     {

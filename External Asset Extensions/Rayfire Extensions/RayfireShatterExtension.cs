@@ -1,10 +1,8 @@
-﻿//#define RAYFIRE
-
-#if RAYFIRE
+﻿#if IW_RAYFIRE_EXTENSIONS
 using UnityEditor;
 using UnityEngine;
 
-namespace ImprovedWorkflow.RayfireExtensions
+namespace IW.RayfireExtensions
 {
     public class RayfireShatterExtension : EditorWindow
     {
@@ -16,7 +14,7 @@ namespace ImprovedWorkflow.RayfireExtensions
         public Mesh[] meshes;
 
         // editor window opener
-        [MenuItem("Workflow/Rayfire Shatter Helper")]
+        [MenuItem("Tools/Workflow/Rayfire Shatter Helper")]
         public static void ShowWindow()
         {
             var window = GetWindow(typeof(RayfireShatterExtension));

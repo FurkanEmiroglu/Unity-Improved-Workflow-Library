@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ImprovedWorkflow.UtilClasses
+namespace IW.UtilClasses
 {
     /// <summary>
     ///     This class prevents performance problems if you forget any Logging in your code.

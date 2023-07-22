@@ -7,6 +7,7 @@ namespace IW.EditorExtensions
     public class IWSettingsEditor : Editor
     {
         private SerializedProperty[] m_dependencyProperties;
+        
         private string[] m_dependencyLabels;
         private string[] m_dependencySymbols;
         
@@ -14,32 +15,40 @@ namespace IW.EditorExtensions
         private SerializedProperty m_rayfireEnabled;
         private SerializedProperty m_cinemachineEnabled;
         private SerializedProperty m_odinEnabled;
+        
+        private SerializedProperty m_scriptableCreatorNamespaces;
 
         private void OnEnable()
-        { 
+        {
             m_dotweenEnabled = serializedObject.FindProperty("_doTweenIncluded");
             m_rayfireEnabled = serializedObject.FindProperty("_rayfireIncluded");
             m_cinemachineEnabled = serializedObject.FindProperty("_cinemachineIncluded");
+            m_odinEnabled = serializedObject.FindProperty("_odinIncluded");
             
+            m_scriptableCreatorNamespaces = serializedObject.FindProperty("_scriptableCreatorNamespaces");
+
             m_dependencyProperties = new[]
             {
                 m_dotweenEnabled,
                 m_rayfireEnabled,
-                m_cinemachineEnabled
+                m_cinemachineEnabled,
+                m_odinEnabled
             };
             
             m_dependencyLabels = new[]
             {
                 "Dotween Extensions",
                 "Rayfire Extensions",
-                "Cinemachine Extensions"
+                "Cinemachine Extensions",
+                "Odin Inspector Extensions"
             };
             
             m_dependencySymbols = new[]
             {
                 ImprovedWorkflowConstants.DOTWEEN_EXTENSIONS_SYMBOL,
                 ImprovedWorkflowConstants.RAYFIRE_EXTENSIONS_SYMBOL,
-                ImprovedWorkflowConstants.CINEMACHINE_EXTENSIONS_SYMBOL
+                ImprovedWorkflowConstants.CINEMACHINE_EXTENSIONS_SYMBOL,
+                ImprovedWorkflowConstants.ODIN_INSPECTOR_EXTENSIONS
             };
         }
 
@@ -53,6 +62,10 @@ namespace IW.EditorExtensions
             serializedObject.Update();
             
             AddDependencyToggles(m_dependencyLabels, m_dependencyProperties, m_dependencySymbols);
+            
+#if IW_ODIN_INSPECTOR_EXTENSIONS
+            EditorGUILayout.PropertyField(m_scriptableCreatorNamespaces, true);
+#endif
 
             serializedObject.ApplyModifiedProperties();
         }

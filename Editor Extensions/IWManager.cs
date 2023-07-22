@@ -1,3 +1,4 @@
+using PlasticPipe.PlasticProtocol.Messages;
 using UnityEditor;
 using UnityEngine;
 using static IW.EditorExtensions.ImprovedWorkflowConstants;
@@ -33,7 +34,7 @@ namespace IW.EditorExtensions
             m_workflowSettingsEditor.OnInspectorGUI();
         }
         
-        private IWSettings CreateSettingsAsset()
+        private static IWSettings CreateSettingsAsset()
         {
             IWSettings settings = CreateInstance<IWSettings>();
             // path has to start at "Assets"

@@ -27,7 +27,7 @@ namespace IW.EditorExtensions
                 HashSet<Type> gameCoreTemp = new HashSet<Type>();
                 foreach (Type t in temp)
                 {
-                    if (t.Namespace != null && t.Namespace.Contains("GameCore"))
+                    if (t.Namespace != null && GetAnyNameSpaceContains(t.Namespace))
                     {
                         gameCoreTemp.Add(t);
                     }
@@ -40,6 +40,18 @@ namespace IW.EditorExtensions
         public static IEnumerable<T> GetHashSet<T>(IEnumerable<T> source)
         {
             return new HashSet<T>(source);
+        }
+
+        private static bool GetAnyNameSpaceContains(string @namespace)
+        {
+            IWSettings settings = Resources.Load("WorkflowSettings") as IWSettings;
+
+            foreach (string s in settings._scriptableCreatorNamespaces)
+            {
+                if (@namespace.Contains(s))
+                    return true;
+            }
+            return false;
         }
 
         [MenuItem("Assets/Create Scriptable Object", priority = -10000)]

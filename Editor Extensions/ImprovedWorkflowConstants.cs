@@ -3,6 +3,7 @@ namespace IW.EditorExtensions
     public static class ImprovedWorkflowConstants
     {
         public const string SETTINGS_PATH = "Assets/Resources/WorkflowSettings.asset";
+        public const string ASSET_LIBRARY_PATH = "Assets/Resources/AssetLibrary.asset";
         
         public const string DOTWEEN_EXTENSIONS_SYMBOL = "IW_DOTWEEN_EXTENSIONS";
         public const string CINEMACHINE_EXTENSIONS_SYMBOL = "IW_CINEMACHINE_EXTENSIONS";

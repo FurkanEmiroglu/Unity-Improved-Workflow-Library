@@ -12,7 +12,7 @@ namespace IW.EditorExtensions
     {
         #region Opener
 
-        [MenuItem("Tools/Workflow/Scene Tools/Object Placer #z")]
+        [MenuItem("Tools/Workflow/Object Placer #z", default, 1)]
         private static void OpenWindow()
         {
             var window = GetWindow<ObjectPlacer>();

@@ -50,7 +50,7 @@ namespace IW.EditorExtensions
                     ReplaceLights();
         }
 
-        [MenuItem("Tools/Workflow/Scene Tools/Lighting Helper", false, 1)]
+        [MenuItem("Tools/Workflow/Lighting Helper", false, 1)]
         private static void Init()
         {
             LightingHelper window = (LightingHelper)GetWindow(typeof(LightingHelper));

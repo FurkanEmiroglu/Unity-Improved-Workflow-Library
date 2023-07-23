@@ -1,7 +1,7 @@
 {
   "name": "com.furkanemiroglu.improvedworkflow",
   "displayName": "Improved Workflow Package for Unity",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "2021.3",
   "description": "Improved Workflow is a library that contains useful extensions, utilities & implementations that will boost your workflow in Unity.",
   "category": "FurkanEmiroglu",

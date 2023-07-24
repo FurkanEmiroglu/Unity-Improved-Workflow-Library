@@ -84,7 +84,7 @@ namespace IW.EditorExtensions
         }
         
 #if UNITY_EDITOR_WIN
-        [MenuItem("Workflow/Editor Shortcuts/Object Preview #a")]
+        [MenuItem("Tools/Workflow/Editor Shortcuts/Object Preview #a")]
 #elif UNITY_EDITOR_OSX
         [MenuItem("Tools/Workflow/Editor Shortcuts/Object Preview #a")]
 #endif

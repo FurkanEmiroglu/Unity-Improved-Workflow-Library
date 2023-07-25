@@ -1,26 +1,26 @@
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
-using System.Linq;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace IW.EditorExtensions
 {
     public class PrefabAssetLibraryTool : AssetLibraryTool
     {
-        private List<string> allProjectLabels;
-        private List<string> prefabLabels;
-        private List<string> filteredLabels;
-        private string singleFilteredLabel;
+        private readonly bool m_singleTag = false;
+        private List<string> m_allProjectLabels;
+        private bool m_enableBlacklistTags = true;
 
-        private bool singleTag = false;
-        private string searchfilter;
-        private bool enableBlacklistTags = true;
+        private List<string> m_filteredAssetPaths;
+        private List<string> m_filteredLabels;
+        private List<string> m_prefabLabels;
+        private Dictionary<string, GameObject> m_scannedAssetObjects;
 
-        private List<string> scannedAssetPaths;
-        private Dictionary<string, GameObject> scannedAssetObjects;
-
-        private List<string> filteredAssetPaths;
+        private List<string> m_scannedAssetPaths;
+        private string m_searchfilter;
+        private string m_singleFilteredLabel;
 
         public override string ToolName()
         {
@@ -39,7 +39,7 @@ namespace IW.EditorExtensions
                 EditorUtility.ClearProgressBar();
             }
 
-            SearchAssets(searchfilter);
+            SearchAssets(m_searchfilter);
         }
 
         public override void DrawTopbar()
@@ -52,37 +52,39 @@ namespace IW.EditorExtensions
                 {
                     ScanAssets();
                     ScanAllLabels();
-                } catch(Exception e)
+                }
+                catch (Exception e)
                 {
                     Debug.LogError(e.Message + "\n\n" + e.StackTrace);
                     EditorUtility.ClearProgressBar();
                 }
 
                 //Search
-                SearchAssets(searchfilter);
+                SearchAssets(m_searchfilter);
             }
 
-            if (GUILayout.Toggle(enableBlacklistTags, new GUIContent("BL","Hide Blacklisted Labels"), EditorStyles.toolbarButton, GUILayout.Width(40)) != enableBlacklistTags)
+            if (GUILayout.Toggle(m_enableBlacklistTags, new GUIContent("BL", "Hide Blacklisted Labels"), EditorStyles.toolbarButton,
+                    GUILayout.Width(40)) != m_enableBlacklistTags)
             {
-                enableBlacklistTags = !enableBlacklistTags;
+                m_enableBlacklistTags = !m_enableBlacklistTags;
                 search = true;
             }
 
             EditorGUI.BeginChangeCheck();
 
-            searchfilter = EditorGUILayout.TextField(searchfilter, EditorStyles.toolbarSearchField);
+            m_searchfilter = EditorGUILayout.TextField(m_searchfilter, EditorStyles.toolbarSearchField);
 
-            if (singleTag)
-                singleFilteredLabel = SingleSelectDropdown("", singleFilteredLabel, prefabLabels, EditorStyles.toolbarDropDown);
+            if (m_singleTag)
+                m_singleFilteredLabel = SingleSelectDropdown("", m_singleFilteredLabel, m_prefabLabels, EditorStyles.toolbarDropDown);
             else
-                filteredLabels = MultiSelectDropdown("", filteredLabels, prefabLabels, EditorStyles.toolbarDropDown, GUILayout.MaxWidth(200));
+                m_filteredLabels = MultiSelectDropdown("", m_filteredLabels, m_prefabLabels, EditorStyles.toolbarDropDown,
+                    GUILayout.MaxWidth(200));
 
             if (EditorGUI.EndChangeCheck())
                 search = true;
 
             if (search)
-                SearchAssets(searchfilter);
-
+                SearchAssets(m_searchfilter);
         }
 
         protected override bool EnableHoverContent()
@@ -92,19 +94,19 @@ namespace IW.EditorExtensions
 
         protected override void DrawHoverContent(int index)
         {
-            GameObject prefab = scannedAssetObjects[filteredAssetPaths[index]];
+            GameObject prefab = m_scannedAssetObjects[m_filteredAssetPaths[index]];
 
             string name = prefab.name;
 
             if (name.StartsWith("pre_"))
                 name = name.Substring(4, name.Length - 4);
 
-            var labelst = new GUIStyle(EditorStyles.boldLabel);
+            GUIStyle labelst = new(EditorStyles.boldLabel);
             labelst.wordWrap = true;
 
             EditorGUILayout.LabelField(name, labelst);
 
-            var labels = AssetDatabase.GetLabels(prefab);
+            string[] labels = AssetDatabase.GetLabels(prefab);
 
             if (labels.Length > 0)
             {
@@ -119,31 +121,31 @@ namespace IW.EditorExtensions
 
         protected override int GetItemCount()
         {
-            return filteredAssetPaths.Count;
+            return m_filteredAssetPaths.Count;
         }
 
         protected override void OnClickItem(int index)
         {
-            GameObject prefab = scannedAssetObjects[filteredAssetPaths[index]];
+            GameObject prefab = m_scannedAssetObjects[m_filteredAssetPaths[index]];
             Selection.activeGameObject = prefab;
         }
 
         protected override bool IsItemValid(int index)
         {
-            return scannedAssetObjects[filteredAssetPaths[index]] != null;
+            return m_scannedAssetObjects[m_filteredAssetPaths[index]] != null;
         }
 
         protected override LibraryItem GetItem(int index)
         {
-            GameObject prefab = scannedAssetObjects[filteredAssetPaths[index]];
+            GameObject prefab = m_scannedAssetObjects[m_filteredAssetPaths[index]];
 
-            LibraryItem item = new LibraryItem();
-            
-            item.isSelected = Selection.activeObject == prefab;
+            LibraryItem item = new();
 
-            if(Event.current.type != EventType.Layout)
-                item.thumbnail = AssetPreview.GetAssetPreview(prefab);
-            
+            item.IsSelected = Selection.activeObject == prefab;
+
+            if (Event.current.type != EventType.Layout)
+                item.Thumbnail = AssetPreview.GetAssetPreview(prefab);
+
             return item;
         }
 
@@ -154,15 +156,15 @@ namespace IW.EditorExtensions
 
         protected override GameObject CreateGhostPrefab(int index)
         {
-            GameObject prefab = scannedAssetObjects[filteredAssetPaths[index]];
+            GameObject prefab = m_scannedAssetObjects[m_filteredAssetPaths[index]];
             return (GameObject)PrefabUtility.InstantiatePrefab(prefab);
         }
 
         protected override void OnPlaceInScene(int index, Vector3 position)
         {
-            GameObject prefab = scannedAssetObjects[filteredAssetPaths[index]];
+            GameObject prefab = m_scannedAssetObjects[m_filteredAssetPaths[index]];
 
-            var spawnedObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            GameObject spawnedObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             spawnedObject.name = prefab.name;
             spawnedObject.transform.position = position;
             spawnedObject.transform.rotation = Quaternion.identity;
@@ -178,30 +180,29 @@ namespace IW.EditorExtensions
 
         private List<string> GetFilteredLabels()
         {
-            if (singleTag)
-                if (singleFilteredLabel != null)
-                    return new List<string>(new string[] { singleFilteredLabel });
+            if (m_singleTag)
+                if (m_singleFilteredLabel != null)
+                    return new List<string>(new[] { m_singleFilteredLabel });
                 else
                     return new List<string>();
 
-            return filteredLabels;
+            return m_filteredLabels;
         }
 
         private void SearchAssets(string search = "")
         {
-            filteredAssetPaths = new List<string>();
+            m_filteredAssetPaths = new List<string>();
 
             if (search == null)
                 search = "";
 
             search = search.ToLower();
-            foreach (string path in scannedAssetPaths)
-            {
+            foreach (string path in m_scannedAssetPaths)
                 //Check search string
-                if (search == string.Empty || System.IO.Path.GetFileName(path).ToLower().Contains(search))
+                if (search == string.Empty || Path.GetFileName(path).ToLower().Contains(search))
                 {
                     //Check labels
-                    string[] labels = AssetDatabase.GetLabels(scannedAssetObjects[path]);
+                    string[] labels = AssetDatabase.GetLabels(m_scannedAssetObjects[path]);
                     bool success = false;
 
                     //No filtered labels, no problem
@@ -209,28 +210,23 @@ namespace IW.EditorExtensions
                         success = true;
 
                     foreach (string label in GetFilteredLabels())
-                    {
                         if (labels.Contains(label))
                         {
                             success = true;
                             break;
                         }
-                    }
 
                     //Make sure is not in blacklisted label
-                    foreach (string blacklistLabel in AssetLibrary.Instance.blacklistLabels)
-                    {
+                    foreach (string blacklistLabel in AssetLibrary.Instance._blacklistLabels)
                         if (labels.Contains(blacklistLabel))
                         {
                             success = false;
                             break;
                         }
-                    }
 
                     if (success)
-                        filteredAssetPaths.Add(path);
+                        m_filteredAssetPaths.Add(path);
                 }
-            }
         }
 
         private void ScanAssets()
@@ -239,16 +235,16 @@ namespace IW.EditorExtensions
 
             string[] guids = AssetDatabase.FindAssets("t:prefab");
 
-            scannedAssetObjects = new Dictionary<string, GameObject>();
-            scannedAssetPaths = new List<string>();
-            filteredAssetPaths = new List<string>();
+            m_scannedAssetObjects = new Dictionary<string, GameObject>();
+            m_scannedAssetPaths = new List<string>();
+            m_filteredAssetPaths = new List<string>();
 
             int total = guids.Length;
             int sofar = 0;
 
             foreach (string guid in guids)
             {
-                EditorUtility.DisplayProgressBar("Scanning Assets", "Loading Prefabs", (float)sofar / (float)total);
+                EditorUtility.DisplayProgressBar("Scanning Assets", "Loading Prefabs", sofar / (float)total);
                 sofar++;
 
                 string path = AssetDatabase.GUIDToAssetPath(guid);
@@ -259,8 +255,8 @@ namespace IW.EditorExtensions
 
                     if (obj != null)
                     {
-                        scannedAssetPaths.Add(path);
-                        scannedAssetObjects.Add(path, obj);
+                        m_scannedAssetPaths.Add(path);
+                        m_scannedAssetObjects.Add(path, obj);
                     }
                 }
             }
@@ -272,50 +268,43 @@ namespace IW.EditorExtensions
 
         private bool AssetPassesScan(string path)
         {
-                //File is in blacklist
-            foreach (string black in AssetLibrary.Instance.blacklistFolders)
-            {
+            //File is in blacklist
+            foreach (string black in AssetLibrary.Instance._blacklistFolders)
                 if (path.ToLower().StartsWith(black.ToLower()))
                     return false;
-            }
 
-            foreach (string root in AssetLibrary.Instance.rootFolders)
-            {
+            foreach (string root in AssetLibrary.Instance._rootFolders)
                 if (path.ToLower().StartsWith(root.ToLower()))
                     return true;
-            }
 
             return false;
         }
 
         private void ScanAllLabels()
         {
-            allProjectLabels = new List<string>();
+            m_allProjectLabels = new List<string>();
 
-            int total = scannedAssetObjects.Count;
+            int total = m_scannedAssetObjects.Count;
             int sofar = 0;
 
-            foreach (var pair in scannedAssetObjects)
+            foreach (KeyValuePair<string, GameObject> pair in m_scannedAssetObjects)
             {
-                EditorUtility.DisplayProgressBar("Scanning Assets", "Building Labels", (float)sofar/ (float)total);
+                EditorUtility.DisplayProgressBar("Scanning Assets", "Building Labels", sofar / (float)total);
                 sofar++;
 
-                var labels = AssetDatabase.GetLabels(pair.Value);
+                string[] labels = AssetDatabase.GetLabels(pair.Value);
 
                 foreach (string label in labels)
-                {
-                    if (!allProjectLabels.Contains(label))
-                        allProjectLabels.Add(label);
-                }
+                    if (!m_allProjectLabels.Contains(label))
+                        m_allProjectLabels.Add(label);
             }
 
-            prefabLabels = allProjectLabels; //Temporary
+            m_prefabLabels = m_allProjectLabels; //Temporary
 
-            if (filteredLabels == null)
-                filteredLabels = new List<string>();
+            if (m_filteredLabels == null)
+                m_filteredLabels = new List<string>();
 
             EditorUtility.ClearProgressBar();
         }
-
     }
 }

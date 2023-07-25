@@ -8,19 +8,19 @@ using UnityEngine;
 
 public class SearchForComponents : EditorWindow
 {
-    private readonly string[] checkType = { "Check single component", "Check all components" };
-    private string componentName = "";
-    private int editorMode, selectedCheckType;
+    private readonly string[] m_checkType = { "Check single component", "Check all components" };
+    private string m_componentName = "";
+    private int m_editorMode, m_selectedCheckType;
 
-    private List<string> listResult;
+    private List<string> m_listResult;
 
-    private readonly string[] modes = { "Search for component usage", "Search for missing components" };
-    private List<ComponentNames> prefabComponents, notUsedComponents, addedComponents, existingComponents, sceneComponents;
-    private bool recursionVal;
-    private Vector2 scroll, scroll1, scroll2, scroll3, scroll4;
+    private readonly string[] m_modes = { "Search for component usage", "Search for missing components" };
+    private List<ComponentNames> m_prefabComponents, m_notUsedComponents, m_addedComponents, m_existingComponents, m_sceneComponents;
+    private bool m_recursionVal;
+    private Vector2 m_scroll, m_scroll1, m_scroll2, m_scroll3, m_scroll4;
 
-    private bool showPrefabs, showAdded, showScene, showUnused = true;
-    private MonoScript targetComponent;
+    private bool m_showPrefabs, m_showAdded, m_showScene, m_showUnused = true;
+    private MonoScript m_targetComponent;
 
     private void OnGUI()
     {
@@ -31,45 +31,45 @@ public class SearchForComponents : EditorWindow
         Rect windowRect = GUILayoutUtility.GetRect(1, 17);
         windowRect.x += 4;
         windowRect.width -= 7;
-        editorMode = GUI.SelectionGrid(windowRect, editorMode, modes, 2, "Window");
+        m_editorMode = GUI.SelectionGrid(windowRect, m_editorMode, m_modes, 2, "Window");
         GUI.skin.window.padding.bottom = oldValue;
 
-        switch (editorMode)
+        switch (m_editorMode)
         {
             case 0:
-                selectedCheckType = GUILayout.SelectionGrid(selectedCheckType, checkType, 2, "Toggle");
-                recursionVal = GUILayout.Toggle(recursionVal, "Search all dependencies");
-                GUI.enabled = selectedCheckType == 0;
-                targetComponent = (MonoScript)EditorGUILayout.ObjectField(targetComponent, typeof(MonoScript), false);
+                m_selectedCheckType = GUILayout.SelectionGrid(m_selectedCheckType, m_checkType, 2, "Toggle");
+                m_recursionVal = GUILayout.Toggle(m_recursionVal, "Search all dependencies");
+                GUI.enabled = m_selectedCheckType == 0;
+                m_targetComponent = (MonoScript)EditorGUILayout.ObjectField(m_targetComponent, typeof(MonoScript), false);
                 GUI.enabled = true;
 
                 if (GUILayout.Button("Check component usage"))
                 {
                     AssetDatabase.SaveAssets();
-                    switch (selectedCheckType)
+                    switch (m_selectedCheckType)
                     {
                         case 0:
-                            componentName = targetComponent.name;
-                            string targetPath = AssetDatabase.GetAssetPath(targetComponent);
+                            m_componentName = m_targetComponent.name;
+                            string targetPath = AssetDatabase.GetAssetPath(m_targetComponent);
                             string[] allPrefabs = GetAllPrefabs();
-                            listResult = new List<string>();
+                            m_listResult = new List<string>();
                             foreach (string prefab in allPrefabs)
                             {
                                 string[] single = { prefab };
-                                string[] dependencies = AssetDatabase.GetDependencies(single, recursionVal);
+                                string[] dependencies = AssetDatabase.GetDependencies(single, m_recursionVal);
                                 foreach (string dependedAsset in dependencies)
                                     if (dependedAsset == targetPath)
-                                        listResult.Add(prefab);
+                                        m_listResult.Add(prefab);
                             }
 
                             break;
                         case 1:
                             List<string> scenesToLoad = new();
-                            existingComponents = new List<ComponentNames>();
-                            prefabComponents = new List<ComponentNames>();
-                            notUsedComponents = new List<ComponentNames>();
-                            addedComponents = new List<ComponentNames>();
-                            sceneComponents = new List<ComponentNames>();
+                            m_existingComponents = new List<ComponentNames>();
+                            m_prefabComponents = new List<ComponentNames>();
+                            m_notUsedComponents = new List<ComponentNames>();
+                            m_addedComponents = new List<ComponentNames>();
+                            m_sceneComponents = new List<ComponentNames>();
 
                             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
                             {
@@ -80,19 +80,19 @@ public class SearchForComponents : EditorWindow
 
                                 foreach (string asset in allAssets)
                                 {
-                                    int indexCS = asset.IndexOf(".cs");
-                                    int indexJS = asset.IndexOf(".js");
-                                    if (indexCS != -1 || indexJS != -1)
+                                    int indexCs = asset.IndexOf(".cs");
+                                    int indexJs = asset.IndexOf(".js");
+                                    if (indexCs != -1 || indexJs != -1)
                                     {
                                         ComponentNames newComponent = new(NameFromPath(asset), "", asset);
                                         try
                                         {
-                                            FileStream FS = new(projectPath + asset, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                                            StreamReader SR = new(FS);
+                                            FileStream fs = new(projectPath + asset, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                                            StreamReader sr = new(fs);
                                             string line;
-                                            while (!SR.EndOfStream)
+                                            while (!sr.EndOfStream)
                                             {
-                                                line = SR.ReadLine();
+                                                line = sr.ReadLine();
                                                 int index1 = line.IndexOf("namespace");
                                                 int index2 = line.IndexOf("{");
                                                 if (index1 != -1 && index2 != -1)
@@ -101,7 +101,7 @@ public class SearchForComponents : EditorWindow
                                                     index2 = line.IndexOf("{");
                                                     line = line.Substring(0, index2);
                                                     line = line.Replace(" ", "");
-                                                    newComponent.namespaceName = line;
+                                                    newComponent.NamespaceName = line;
                                                 }
                                             }
                                         }
@@ -109,19 +109,19 @@ public class SearchForComponents : EditorWindow
                                         {
                                         }
 
-                                        existingComponents.Add(newComponent);
+                                        m_existingComponents.Add(newComponent);
 
                                         try
                                         {
-                                            FileStream FS = new(projectPath + asset, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                                            StreamReader SR = new(FS);
+                                            FileStream fs = new(projectPath + asset, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                                            StreamReader sr = new(fs);
 
                                             string line;
                                             int lineNum = 0;
-                                            while (!SR.EndOfStream)
+                                            while (!sr.EndOfStream)
                                             {
                                                 lineNum++;
-                                                line = SR.ReadLine();
+                                                line = sr.ReadLine();
                                                 int index = line.IndexOf("AddComponent");
                                                 if (index != -1)
                                                 {
@@ -142,16 +142,16 @@ public class SearchForComponents : EditorWindow
                                                         newComp = new ComponentNames(line.Substring(index + 1, line.Length - (index + 1)),
                                                             line.Substring(0, index), "");
                                                     string pName = asset + ", Line " + lineNum;
-                                                    newComp.usageSource.Add(pName);
-                                                    index = addedComponents.IndexOf(newComp);
+                                                    newComp.UsageSource.Add(pName);
+                                                    index = m_addedComponents.IndexOf(newComp);
                                                     if (index == -1)
                                                     {
-                                                        addedComponents.Add(newComp);
+                                                        m_addedComponents.Add(newComp);
                                                     }
                                                     else
                                                     {
-                                                        if (!addedComponents[index].usageSource.Contains(pName))
-                                                            addedComponents[index].usageSource.Add(pName);
+                                                        if (!m_addedComponents[index].UsageSource.Contains(pName))
+                                                            m_addedComponents[index].UsageSource.Add(pName);
                                                     }
                                                 }
                                             }
@@ -166,22 +166,22 @@ public class SearchForComponents : EditorWindow
                                     if (indexPrefab != -1)
                                     {
                                         string[] single = { asset };
-                                        string[] dependencies = AssetDatabase.GetDependencies(single, recursionVal);
+                                        string[] dependencies = AssetDatabase.GetDependencies(single, m_recursionVal);
                                         foreach (string dependedAsset in dependencies)
                                             if (dependedAsset.IndexOf(".cs") != -1 || dependedAsset.IndexOf(".js") != -1)
                                             {
                                                 ComponentNames newComponent = new(NameFromPath(dependedAsset),
                                                     GetNamespaceFromPath(dependedAsset), dependedAsset);
-                                                int index = prefabComponents.IndexOf(newComponent);
+                                                int index = m_prefabComponents.IndexOf(newComponent);
                                                 if (index == -1)
                                                 {
-                                                    newComponent.usageSource.Add(asset);
-                                                    prefabComponents.Add(newComponent);
+                                                    newComponent.UsageSource.Add(asset);
+                                                    m_prefabComponents.Add(newComponent);
                                                 }
                                                 else
                                                 {
-                                                    if (!prefabComponents[index].usageSource.Contains(asset))
-                                                        prefabComponents[index].usageSource.Add(asset);
+                                                    if (!m_prefabComponents[index].UsageSource.Contains(asset))
+                                                        m_prefabComponents[index].UsageSource.Add(asset);
                                                 }
                                             }
                                     }
@@ -190,11 +190,11 @@ public class SearchForComponents : EditorWindow
                                     if (indexUnity != -1) scenesToLoad.Add(asset);
                                 }
 
-                                for (int i = addedComponents.Count - 1; i > -1; i--)
+                                for (int i = m_addedComponents.Count - 1; i > -1; i--)
                                 {
-                                    addedComponents[i].assetPath = GetPathFromNames(addedComponents[i].namespaceName,
-                                        addedComponents[i].componentName);
-                                    if (addedComponents[i].assetPath == "") addedComponents.RemoveAt(i);
+                                    m_addedComponents[i].AssetPath = GetPathFromNames(m_addedComponents[i].NamespaceName,
+                                        m_addedComponents[i].ComponentName);
+                                    if (m_addedComponents[i].AssetPath == "") m_addedComponents.RemoveAt(i);
                                 }
 
                                 foreach (string scene in scenesToLoad)
@@ -212,33 +212,33 @@ public class SearchForComponents : EditorWindow
                                                 SerializedProperty p = so.FindProperty("m_Script");
                                                 string path = AssetDatabase.GetAssetPath(p.objectReferenceValue);
                                                 ComponentNames newComp = new(NameFromPath(path), GetNamespaceFromPath(path), path);
-                                                newComp.usageSource.Add(scene);
-                                                int index = sceneComponents.IndexOf(newComp);
+                                                newComp.UsageSource.Add(scene);
+                                                int index = m_sceneComponents.IndexOf(newComp);
                                                 if (index == -1)
                                                 {
-                                                    sceneComponents.Add(newComp);
+                                                    m_sceneComponents.Add(newComp);
                                                 }
                                                 else
                                                 {
-                                                    if (!sceneComponents[index].usageSource.Contains(scene))
-                                                        sceneComponents[index].usageSource.Add(scene);
+                                                    if (!m_sceneComponents[index].UsageSource.Contains(scene))
+                                                        m_sceneComponents[index].UsageSource.Add(scene);
                                                 }
                                             }
                                     }
                                 }
 
-                                foreach (ComponentNames c in existingComponents)
+                                foreach (ComponentNames c in m_existingComponents)
                                 {
-                                    if (addedComponents.Contains(c)) continue;
-                                    if (prefabComponents.Contains(c)) continue;
-                                    if (sceneComponents.Contains(c)) continue;
-                                    notUsedComponents.Add(c);
+                                    if (m_addedComponents.Contains(c)) continue;
+                                    if (m_prefabComponents.Contains(c)) continue;
+                                    if (m_sceneComponents.Contains(c)) continue;
+                                    m_notUsedComponents.Add(c);
                                 }
 
-                                addedComponents.Sort(SortAlphabetically);
-                                prefabComponents.Sort(SortAlphabetically);
-                                sceneComponents.Sort(SortAlphabetically);
-                                notUsedComponents.Sort(SortAlphabetically);
+                                m_addedComponents.Sort(SortAlphabetically);
+                                m_prefabComponents.Sort(SortAlphabetically);
+                                m_sceneComponents.Sort(SortAlphabetically);
+                                m_notUsedComponents.Sort(SortAlphabetically);
                             }
 
                             break;
@@ -250,7 +250,7 @@ public class SearchForComponents : EditorWindow
                 if (GUILayout.Button("Search!"))
                 {
                     string[] allPrefabs = GetAllPrefabs();
-                    listResult = new List<string>();
+                    m_listResult = new List<string>();
                     foreach (string prefab in allPrefabs)
                     {
                         Object o = AssetDatabase.LoadMainAssetAtPath(prefab);
@@ -261,7 +261,7 @@ public class SearchForComponents : EditorWindow
                             Component[] components = go.GetComponentsInChildren<Component>(true);
                             foreach (Component c in components)
                                 if (c == null)
-                                    listResult.Add(prefab);
+                                    m_listResult.Add(prefab);
                         }
                         catch
                         {
@@ -273,23 +273,23 @@ public class SearchForComponents : EditorWindow
                 break;
         }
 
-        if (editorMode == 1 || selectedCheckType == 0)
+        if (m_editorMode == 1 || m_selectedCheckType == 0)
         {
-            if (listResult != null)
+            if (m_listResult != null)
             {
-                if (listResult.Count == 0)
+                if (m_listResult.Count == 0)
                 {
-                    GUILayout.Label(editorMode == 0
-                        ? componentName == "" ? "Choose a component" : "No prefabs use component " + componentName
+                    GUILayout.Label(m_editorMode == 0
+                        ? m_componentName == "" ? "Choose a component" : "No prefabs use component " + m_componentName
                         : "No prefabs have missing components!\nClick Search to check again");
                 }
                 else
                 {
-                    GUILayout.Label(editorMode == 0
-                        ? "The following " + listResult.Count + " prefabs use component " + componentName + ":"
+                    GUILayout.Label(m_editorMode == 0
+                        ? "The following " + m_listResult.Count + " prefabs use component " + m_componentName + ":"
                         : "The following prefabs have missing components:");
-                    scroll = GUILayout.BeginScrollView(scroll);
-                    foreach (string s in listResult)
+                    m_scroll = GUILayout.BeginScrollView(m_scroll);
+                    foreach (string s in m_listResult)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.Label(s, GUILayout.Width(position.width / 2));
@@ -304,32 +304,32 @@ public class SearchForComponents : EditorWindow
         }
         else
         {
-            showPrefabs = GUILayout.Toggle(showPrefabs, "Show prefab components");
-            if (showPrefabs)
+            m_showPrefabs = GUILayout.Toggle(m_showPrefabs, "Show prefab components");
+            if (m_showPrefabs)
             {
                 GUILayout.Label("The following components are attatched to prefabs:");
-                DisplayResults(ref scroll1, ref prefabComponents);
+                DisplayResults(ref m_scroll1, ref m_prefabComponents);
             }
 
-            showAdded = GUILayout.Toggle(showAdded, "Show AddComponent arguments");
-            if (showAdded)
+            m_showAdded = GUILayout.Toggle(m_showAdded, "Show AddComponent arguments");
+            if (m_showAdded)
             {
                 GUILayout.Label("The following components are AddComponent arguments:");
-                DisplayResults(ref scroll2, ref addedComponents);
+                DisplayResults(ref m_scroll2, ref m_addedComponents);
             }
 
-            showScene = GUILayout.Toggle(showScene, "Show Scene-used components");
-            if (showScene)
+            m_showScene = GUILayout.Toggle(m_showScene, "Show Scene-used components");
+            if (m_showScene)
             {
                 GUILayout.Label("The following components are used by scene objects:");
-                DisplayResults(ref scroll3, ref sceneComponents);
+                DisplayResults(ref m_scroll3, ref m_sceneComponents);
             }
 
-            showUnused = GUILayout.Toggle(showUnused, "Show Unused Components");
-            if (showUnused)
+            m_showUnused = GUILayout.Toggle(m_showUnused, "Show Unused Components");
+            if (m_showUnused)
             {
                 GUILayout.Label("The following components are not used by prefabs, by AddComponent, OR in any scene:");
-                DisplayResults(ref scroll4, ref notUsedComponents);
+                DisplayResults(ref m_scroll4, ref m_notUsedComponents);
             }
         }
     }
@@ -344,7 +344,7 @@ public class SearchForComponents : EditorWindow
 
     private int SortAlphabetically(ComponentNames a, ComponentNames b)
     {
-        return a.assetPath.CompareTo(b.assetPath);
+        return a.AssetPath.CompareTo(b.AssetPath);
     }
 
     private GameObject[] GetAllObjectsInScene()
@@ -373,14 +373,14 @@ public class SearchForComponents : EditorWindow
         foreach (ComponentNames c in list)
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label(c.assetPath, GUILayout.Width(position.width / 5 * 4));
+            GUILayout.Label(c.AssetPath, GUILayout.Width(position.width / 5 * 4));
             if (GUILayout.Button("Select", GUILayout.Width(position.width / 5 - 30)))
-                Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(c.assetPath);
+                Selection.activeObject = AssetDatabase.LoadMainAssetAtPath(c.AssetPath);
             GUILayout.EndHorizontal();
-            if (c.usageSource.Count == 1) GUILayout.Label("   In 1 Place: " + c.usageSource[0]);
-            if (c.usageSource.Count > 1)
-                GUILayout.Label("   In " + c.usageSource.Count + " Places: " + c.usageSource[0] + ", " + c.usageSource[1] +
-                                (c.usageSource.Count > 2 ? ", ..." : ""));
+            if (c.UsageSource.Count == 1) GUILayout.Label("   In 1 Place: " + c.UsageSource[0]);
+            if (c.UsageSource.Count > 1)
+                GUILayout.Label("   In " + c.UsageSource.Count + " Places: " + c.UsageSource[0] + ", " + c.UsageSource[1] +
+                                (c.UsageSource.Count > 2 ? ", ..." : ""));
         }
 
         GUILayout.EndScrollView();
@@ -394,17 +394,17 @@ public class SearchForComponents : EditorWindow
 
     private string GetNamespaceFromPath(string path)
     {
-        foreach (ComponentNames c in existingComponents)
-            if (c.assetPath == path)
-                return c.namespaceName;
+        foreach (ComponentNames c in m_existingComponents)
+            if (c.AssetPath == path)
+                return c.NamespaceName;
         return "";
     }
 
     private string GetPathFromNames(string space, string name)
     {
         ComponentNames test = new(name, space, "");
-        int index = existingComponents.IndexOf(test);
-        if (index != -1) return existingComponents[index].assetPath;
+        int index = m_existingComponents.IndexOf(test);
+        if (index != -1) return m_existingComponents[index].AssetPath;
         return "";
     }
 
@@ -420,27 +420,27 @@ public class SearchForComponents : EditorWindow
 
     private class ComponentNames
     {
-        public string assetPath;
-        public readonly string componentName;
-        public string namespaceName;
-        public readonly List<string> usageSource;
+        public string AssetPath;
+        public readonly string ComponentName;
+        public string NamespaceName;
+        public readonly List<string> UsageSource;
 
         public ComponentNames(string comp, string space, string path)
         {
-            componentName = comp;
-            namespaceName = space;
-            assetPath = path;
-            usageSource = new List<string>();
+            ComponentName = comp;
+            NamespaceName = space;
+            AssetPath = path;
+            UsageSource = new List<string>();
         }
 
         public override bool Equals(object obj)
         {
-            return ((ComponentNames)obj).componentName == componentName && ((ComponentNames)obj).namespaceName == namespaceName;
+            return ((ComponentNames)obj).ComponentName == ComponentName && ((ComponentNames)obj).NamespaceName == NamespaceName;
         }
 
         public override int GetHashCode()
         {
-            return componentName.GetHashCode() + namespaceName.GetHashCode();
+            return ComponentName.GetHashCode() + NamespaceName.GetHashCode();
         }
     }
 }

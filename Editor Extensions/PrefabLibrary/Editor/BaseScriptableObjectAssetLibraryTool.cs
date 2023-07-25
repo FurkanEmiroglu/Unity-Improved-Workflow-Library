@@ -1,17 +1,19 @@
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace IW.EditorExtensions
 {
     public abstract class BaseScriptableObjectAssetLibraryTool : AssetLibraryTool
     {
-        protected Dictionary<string, ScriptableObject> scannedAssetObjects;
-        protected List<string> filteredAssetPaths;
+        private Dictionary<ScriptableObject, Texture2D> m_cachedThumbnails;
+        protected List<string> FilteredAssetPaths;
+        protected Dictionary<string, ScriptableObject> ScannedAssetObjects;
 
-        private string searchfilter;
-        private Dictionary<ScriptableObject, Texture2D> cachedThumbnails;
+        private string m_searchfilter;
 
         protected abstract Type GetScriptableObjectType();
 
@@ -24,68 +26,64 @@ namespace IW.EditorExtensions
 
         protected void ClearThumbnailChache()
         {
-            cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
+            m_cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
         }
 
         public override void Init()
         {
-            cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
+            m_cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
             ScanAssets();
-            SearchAssets(searchfilter);
+            SearchAssets(m_searchfilter);
         }
 
         public override void DrawTopbar()
         {
             if (GUILayout.Button(EditorGUIUtility.IconContent("TreeEditor.Refresh"), EditorStyles.toolbarButton, GUILayout.Width(50)))
             {
-                cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
+                m_cachedThumbnails = new Dictionary<ScriptableObject, Texture2D>();
 
                 ScanAssets();
-                SearchAssets(searchfilter);
+                SearchAssets(m_searchfilter);
             }
 
             EditorGUI.BeginChangeCheck();
 
-            searchfilter = EditorGUILayout.TextField(searchfilter, EditorStyles.toolbarSearchField);
+            m_searchfilter = EditorGUILayout.TextField(m_searchfilter, EditorStyles.toolbarSearchField);
 
             bool search = EditorGUI.EndChangeCheck();
             if (search)
-                SearchAssets(searchfilter);
-
+                SearchAssets(m_searchfilter);
         }
 
         protected override int GetItemCount()
         {
-            return filteredAssetPaths.Count;
+            return FilteredAssetPaths.Count;
         }
 
         protected override void OnClickItem(int index)
         {
-            ScriptableObject asset = scannedAssetObjects[filteredAssetPaths[index]];
+            ScriptableObject asset = ScannedAssetObjects[FilteredAssetPaths[index]];
             Selection.activeObject = asset;
         }
 
         public override void OnDestroy()
         {
-            if (cachedThumbnails == null)
+            if (m_cachedThumbnails == null)
                 return;
 
-            foreach (KeyValuePair<ScriptableObject, Texture2D> pair in cachedThumbnails)
-            {
-                GameObject.DestroyImmediate(pair.Value);
-            }
+            foreach (KeyValuePair<ScriptableObject, Texture2D> pair in m_cachedThumbnails) Object.DestroyImmediate(pair.Value);
         }
 
         protected override bool IsItemValid(int index)
         {
-            return scannedAssetObjects[filteredAssetPaths[index]] != null;
+            return ScannedAssetObjects[FilteredAssetPaths[index]] != null;
         }
 
         protected override LibraryItem GetItem(int index)
         {
-            ScriptableObject scriptableObject = scannedAssetObjects[filteredAssetPaths[index]];
+            ScriptableObject scriptableObject = ScannedAssetObjects[FilteredAssetPaths[index]];
 
-            LibraryItem item = new LibraryItem();
+            LibraryItem item = new();
 
             /*
             //Tooltip
@@ -95,42 +93,36 @@ namespace IW.EditorExtensions
                 item.tooltip = item.tooltip.Substring(4, item.tooltip.Length - 4);
             */
 
-            if (!cachedThumbnails.ContainsKey(scriptableObject))
-            {
-                cachedThumbnails[scriptableObject] = GenerateScriptableObjectThumbnail(index);
-            }
+            if (!m_cachedThumbnails.ContainsKey(scriptableObject))
+                m_cachedThumbnails[scriptableObject] = GenerateScriptableObjectThumbnail(index);
 
-            item.thumbnail = cachedThumbnails[scriptableObject];
-            item.isSelected = Selection.activeObject == scriptableObject;
+            item.Thumbnail = m_cachedThumbnails[scriptableObject];
+            item.IsSelected = Selection.activeObject == scriptableObject;
 
             return item;
         }
 
         private void SearchAssets(string search)
         {
-            filteredAssetPaths = new List<string>();
+            FilteredAssetPaths = new List<string>();
 
-            foreach(var pair in scannedAssetObjects)
-            {
-                if (search == string.Empty || search == null || System.IO.Path.GetFileName(pair.Key).ToLower().Contains(search))
-                {
-                    filteredAssetPaths.Add(pair.Key);
-                }
-            }
+            foreach (KeyValuePair<string, ScriptableObject> pair in ScannedAssetObjects)
+                if (search == string.Empty || search == null || Path.GetFileName(pair.Key).ToLower().Contains(search))
+                    FilteredAssetPaths.Add(pair.Key);
         }
 
         private void ScanAssets()
         {
             string[] guids = AssetDatabase.FindAssets("t:" + GetScriptableObjectType().Name);
 
-            scannedAssetObjects = new Dictionary<string, ScriptableObject>();
+            ScannedAssetObjects = new Dictionary<string, ScriptableObject>();
 
             foreach (string guid in guids)
             {
                 string path = AssetDatabase.GUIDToAssetPath(guid);
                 ScriptableObject obj = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path.Replace("\\", "/"));
 
-                scannedAssetObjects[path] = obj;
+                ScannedAssetObjects[path] = obj;
             }
         }
     }

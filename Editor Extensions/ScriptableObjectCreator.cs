@@ -44,7 +44,7 @@ namespace IW.EditorExtensions
 
         private static bool GetAnyNameSpaceContains(string @namespace)
         {
-            IWSettings settings = Resources.Load("WorkflowSettings") as IWSettings;
+            IwSettings settings = Resources.Load("WorkflowSettings") as IwSettings;
 
             foreach (string s in settings._scriptableCreatorNamespaces)
             {
@@ -72,12 +72,12 @@ namespace IW.EditorExtensions
             window.ShowUtility();
             window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 500);
             window.titleContent = new GUIContent(path);
-            window.targetFolder = path.Trim('/');
+            window.m_targetFolder = path.Trim('/');
         }
 
-        private ScriptableObject previewObject;
-        private string targetFolder;
-        private Vector2 scroll;
+        private ScriptableObject m_previewObject;
+        private string m_targetFolder;
+        private Vector2 m_scroll;
 
         private Type SelectedType
         {
@@ -101,9 +101,9 @@ namespace IW.EditorExtensions
             tree.Selection.SelectionConfirmed += x => this.CreateAsset();
             tree.Selection.SelectionChanged += e =>
             {
-                if (this.previewObject && !AssetDatabase.Contains(this.previewObject))
+                if (this.m_previewObject && !AssetDatabase.Contains(this.m_previewObject))
                 {
-                    DestroyImmediate(this.previewObject);
+                    DestroyImmediate(this.m_previewObject);
                 }
 
                 if (e != SelectionChangedType.ItemAdded)
@@ -114,7 +114,7 @@ namespace IW.EditorExtensions
                 Type t = this.SelectedType;
                 if (t != null && !t.IsAbstract)
                 {
-                    this.previewObject = CreateInstance(t) as ScriptableObject;
+                    this.m_previewObject = CreateInstance(t) as ScriptableObject;
                 }
             };
 
@@ -138,18 +138,18 @@ namespace IW.EditorExtensions
 
         protected override IEnumerable<object> GetTargets()
         {
-            yield return this.previewObject;
+            yield return this.m_previewObject;
         }
 
         protected override void DrawEditor(int index)
         {
-            this.scroll = GUILayout.BeginScrollView(this.scroll);
+            this.m_scroll = GUILayout.BeginScrollView(this.m_scroll);
             {
                 base.DrawEditor(index);
             }
             GUILayout.EndScrollView();
 
-            if (this.previewObject)
+            if (this.m_previewObject)
             {
                 GUILayout.FlexibleSpace();
                 SirenixEditorGUI.HorizontalLineSeparator(1);
@@ -168,22 +168,22 @@ namespace IW.EditorExtensions
 
         private void CreateAsset()
         {
-            if (this.previewObject)
+            if (this.m_previewObject)
             {
-                string dest = this.targetFolder + "/" + this.MenuTree.Selection.First().Name + ".asset";
+                string dest = this.m_targetFolder + "/" + this.MenuTree.Selection.First().Name + ".asset";
                 dest = AssetDatabase.GenerateUniqueAssetPath(dest);
-                ProjectWindowUtil.CreateAsset(this.previewObject, dest);
+                ProjectWindowUtil.CreateAsset(this.m_previewObject, dest);
                 //EditorApplication.delayCall += this.Close;
             }
         }
 
         private void CreateAssetAndClose()
         {
-            if (this.previewObject)
+            if (this.m_previewObject)
             {
-                string dest = this.targetFolder + "/" + this.MenuTree.Selection.First().Name + ".asset";
+                string dest = this.m_targetFolder + "/" + this.MenuTree.Selection.First().Name + ".asset";
                 dest = AssetDatabase.GenerateUniqueAssetPath(dest);
-                ProjectWindowUtil.CreateAsset(this.previewObject, dest);
+                ProjectWindowUtil.CreateAsset(this.m_previewObject, dest);
                 EditorApplication.delayCall += this.Close;
             }
         }

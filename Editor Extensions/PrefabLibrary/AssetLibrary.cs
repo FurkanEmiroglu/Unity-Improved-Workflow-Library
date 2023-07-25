@@ -4,32 +4,32 @@ namespace IW.EditorExtensions
 {
     public class AssetLibrary : ScriptableObject
     {
-        private static AssetLibrary instance;
+        private static AssetLibrary s_instance;
 #if UNITY_EDITOR
         public static AssetLibrary Instance
         {
             get
             {
-                if (instance != null)
-                    return instance;
+                if (s_instance != null)
+                    return s_instance;
 
-                instance = Resources.Load<AssetLibrary>("AssetLibrary");
+                s_instance = Resources.Load<AssetLibrary>("AssetLibrary");
 
-                if (instance == null)
+                if (s_instance == null)
                 {
-                    instance = CreateInstance<AssetLibrary>();
-                    instance.rootFolders = new string[1] { "Assets/" };
-                    UnityEditor.AssetDatabase.CreateAsset(instance, "Assets/Resources/AssetLibrary.asset");
+                    s_instance = CreateInstance<AssetLibrary>();
+                    s_instance._rootFolders = new string[1] { "Assets/" };
+                    UnityEditor.AssetDatabase.CreateAsset(s_instance, "Assets/Resources/AssetLibrary.asset");
                     UnityEditor.AssetDatabase.Refresh();
                 }
 
-                return instance;
+                return s_instance;
             }
         }
 #endif
-        public string[] rootFolders = new string[0];
-        public string[] blacklistFolders = new string[0];
-        public string[] blacklistLabels = new string[0];
+        public string[] _rootFolders = new string[0];
+        public string[] _blacklistFolders = new string[0];
+        public string[] _blacklistLabels = new string[0];
     }
 
 

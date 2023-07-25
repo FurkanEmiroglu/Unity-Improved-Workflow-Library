@@ -1,49 +1,106 @@
-using UnityEngine;
-using UnityEditor;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace IW.EditorExtensions
 {
     public abstract class AssetLibraryTool : ISceneDragReceiver
     {
-        private GameObject ghostObject;
-        private GameObject ghostObjectPrefab;
-        private bool isDragging;
+        private GameObject m_ghostObject;
+        private GameObject m_ghostObjectPrefab;
+        private GUIStyle m_hoverAreaStyle;
 
-        private Vector2 scroll;
-        private Action Redraw;
+        private int m_hoveredItem;
+        private int m_hoveredItemDirection;
+        private Vector2 m_hoveredPosition;
+        private bool m_isDragging;
+        private Action m_redraw;
 
-        private int hoveredItem;
-        private int hoveredItemDirection;
-        private Vector2 hoveredPosition;
-        private GUIStyle hoverAreaStyle;
+        private Vector2 m_scroll;
 
         protected GUIStyle HoverAreaStyle
         {
             get
             {
-                if(hoverAreaStyle == null || hoverAreaStyle.normal.background == null)
+                if (m_hoverAreaStyle == null || m_hoverAreaStyle.normal.background == null)
                 {
-                    hoverAreaStyle = new GUIStyle();
-                    hoverAreaStyle.normal.background = AssetLibraryTool.CreatePixelTexture(new Color(.22f, .22f, .22f));
+                    m_hoverAreaStyle = new GUIStyle();
+                    m_hoverAreaStyle.normal.background = CreatePixelTexture(new Color(.22f, .22f, .22f));
                 }
 
-                return hoverAreaStyle;
+                return m_hoverAreaStyle;
             }
         }
 
-
-        protected struct LibraryItem
+        void ISceneDragReceiver.StartDrag(object data)
         {
-            public Texture2D thumbnail;
-            public string tooltip;
-            public bool isSelected;
+            m_isDragging = true;
+
+            if (m_ghostObject != null)
+                Object.DestroyImmediate(m_ghostObject);
         }
 
-        public void SetRedraw(Action Redraw)
+        void ISceneDragReceiver.StopDrag(object data)
         {
-            this.Redraw = Redraw;
+            m_isDragging = false;
+
+            if (m_ghostObject != null)
+                Object.DestroyImmediate(m_ghostObject);
+        }
+
+        DragAndDropVisualMode ISceneDragReceiver.UpdateDrag(Event evt, EventType eventType, object data)
+        {
+            int index = (int)data;
+            Vector3 mousePosition = Event.current.mousePosition;
+            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+
+            if (SceneView.lastActiveSceneView == null)
+                return DragAndDropVisualMode.Generic;
+
+            if (m_ghostObject == null)
+            {
+                m_ghostObject = CreateGhostPrefab(index);
+                m_ghostObject.transform.rotation = Quaternion.identity;
+                m_ghostObject.hideFlags = HideFlags.HideAndDontSave;
+            }
+
+            Vector3 hitPoint;
+
+            if (Raycast(ray, 1000, m_ghostObject, out hitPoint))
+                m_ghostObject.transform.position = hitPoint;
+            else
+                m_ghostObject.transform.position = ray.origin + ray.direction * 10;
+
+            return DragAndDropVisualMode.Generic;
+        }
+
+        void ISceneDragReceiver.PerformDrag(Event evt, object data)
+        {
+            m_isDragging = false;
+
+            int index = (int)data;
+
+            if (SceneView.lastActiveSceneView == null)
+                return;
+
+            Vector3 mousePosition = Event.current.mousePosition;
+            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+            Vector3 hitPoint;
+
+            if (Raycast(ray, 1000, m_ghostObject, out hitPoint))
+                OnPlaceInScene(index, hitPoint);
+            else
+                OnPlaceInScene(index, ray.origin + ray.direction * 10);
+
+            if (m_ghostObject != null)
+                Object.DestroyImmediate(m_ghostObject);
+        }
+
+        public void SetRedraw(Action redraw)
+        {
+            this.m_redraw = redraw;
         }
 
         public abstract string ToolName();
@@ -71,10 +128,10 @@ namespace IW.EditorExtensions
             float buttonWidth = 80;
             float width = 300;
 
-            var rect = new Rect(position.x, position.y, width, 200);
+            Rect rect = new(position.x, position.y, width, 200);
 
             if (direction == 0)
-                rect.x = position.x - buttonWidth/2 + 10;
+                rect.x = position.x - buttonWidth / 2 + 10;
 
             if (direction == 1)
                 rect.x = position.x - width / 4;
@@ -86,7 +143,7 @@ namespace IW.EditorExtensions
                 rect.x = position.x - width / 1.5f;
 
             else if (direction == 4)
-                rect.x = position.x - width + buttonWidth/2 - 10;
+                rect.x = position.x - width + buttonWidth / 2 - 10;
 
             GUILayout.BeginArea(rect);
             GUILayout.BeginHorizontal();
@@ -100,7 +157,9 @@ namespace IW.EditorExtensions
             {
                 DrawHoverContent(index);
             }
-            catch { }
+            catch
+            {
+            }
 
             GUILayout.EndVertical();
 
@@ -129,30 +188,29 @@ namespace IW.EditorExtensions
 
         protected virtual void OnPlaceInScene(int index, Vector3 position)
         {
-
         }
 
         public virtual void DrawContent(float windowHeight, int buttonSize)
         {
             float windowWidth = EditorGUIUtility.currentViewWidth;
-            int numberOfCols = (int)((windowWidth - 5) / (buttonSize));
+            int numberOfCols = (int)((windowWidth - 5) / buttonSize);
             int numberOfRows = GetItemCount() / numberOfCols + 1;
 
             Rect fullRect = EditorGUILayout.GetControlRect(false, buttonSize * numberOfRows, GUILayout.Width(windowWidth - 25));
-            Rect viewRect = new Rect(fullRect.x, fullRect.y, fullRect.width + 15, windowHeight - fullRect.y);
+            Rect viewRect = new(fullRect.x, fullRect.y, fullRect.width + 15, windowHeight - fullRect.y);
 
-            scroll = GUI.BeginScrollView(viewRect, scroll, fullRect, false, true);
+            m_scroll = GUI.BeginScrollView(viewRect, m_scroll, fullRect, false, true);
 
-            Rect scrolledViewRect = new Rect(viewRect.position + scroll, viewRect.size);
+            Rect scrolledViewRect = new(viewRect.position + m_scroll, viewRect.size);
 
             int row = 0;
             int col = 0;
             int c = 0;
 
-            bool isVisible = hoveredItem != -1;
+            bool isVisible = m_hoveredItem != -1;
 
             if (Event.current.type != EventType.Layout)
-                hoveredItem = -1;
+                m_hoveredItem = -1;
 
             for (int i = 0; i < GetItemCount(); i++)
             {
@@ -169,48 +227,50 @@ namespace IW.EditorExtensions
                     col++;
                 }
 
-                Rect buttonRect = new Rect(fullRect.x + col * buttonSize, fullRect.y + row * buttonSize, buttonSize, buttonSize);
+                Rect buttonRect = new(fullRect.x + col * buttonSize, fullRect.y + row * buttonSize, buttonSize, buttonSize);
 
                 if (buttonRect.Overlaps(scrolledViewRect) && Event.current.type != EventType.Layout)
                     DrawAssetButton(buttonRect, i);
 
                 if (buttonRect.Contains(Event.current.mousePosition) && scrolledViewRect.Contains(Event.current.mousePosition))
                 {
-                    hoveredPosition = buttonRect.position + new Vector2(buttonRect.size.x/2, buttonRect.size.y) - scroll;
-                    hoveredItem = i;
+                    m_hoveredPosition = buttonRect.position + new Vector2(buttonRect.size.x / 2, buttonRect.size.y) - m_scroll;
+                    m_hoveredItem = i;
 
                     if (col == 0)
-                        hoveredItemDirection = 0;
-                    
+                        m_hoveredItemDirection = 0;
+
                     else if (col == 1)
-                        hoveredItemDirection = 1;
+                        m_hoveredItemDirection = 1;
                     else if ((c + 2) % numberOfCols == 0)
-                        hoveredItemDirection = 3;
+                        m_hoveredItemDirection = 3;
                     else if ((c + 1) % numberOfCols == 0)
-                        hoveredItemDirection = 4;
+                        m_hoveredItemDirection = 4;
                     else
-                        hoveredItemDirection = 2;
+                        m_hoveredItemDirection = 2;
                 }
-                
+
                 c++;
             }
 
             GUI.EndScrollView();
-            if(hoveredItem != -1 && EnableHoverContent() && !(!isVisible && Event.current.type == EventType.Repaint))
-                DrawHoverContainer(hoveredPosition, hoveredItemDirection, hoveredItem);
+            if (m_hoveredItem != -1 && EnableHoverContent() && !(!isVisible && Event.current.type == EventType.Repaint))
+                DrawHoverContainer(m_hoveredPosition, m_hoveredItemDirection, m_hoveredItem);
         }
 
         private bool DrawAssetButton(Rect rect, int itemIndex)
         {
             LibraryItem item = GetItem(itemIndex);
 
-            bool selected = item.isSelected;
+            bool selected = item.IsSelected;
 
             //Select in inspector
             if (rect.Contains(Event.current.mousePosition))
             {
                 if (Event.current.type == EventType.MouseDown)
+                {
                     selected = true;
+                }
 
                 else if (Event.current.type == EventType.MouseUp)
                 {
@@ -218,25 +278,27 @@ namespace IW.EditorExtensions
 
                     OnClickItem(itemIndex);
 
-                    if (!isDragging)
+                    if (!m_isDragging)
                         Event.current.Use();
                 }
             }
 
             //Drag and drop
             if (EnableDragIntoScene())
-            {
                 if (rect.Contains(Event.current.mousePosition) && Event.current.type == EventType.MouseDrag)
                     SceneDragAndDrop.StartDrag(this, "ring_and_ding", itemIndex);
-            }
 
-            var style = selected ? AssetLibraryWindow.toggleButtonStyleToggled : AssetLibraryWindow.toggleButtonStyleNormal;
-            GUI.Box(rect, new GUIContent(item.thumbnail, item.tooltip), style);
+            GUIStyle style = selected ? AssetLibraryWindow.ToggleButtonStyleToggled : AssetLibraryWindow.ToggleButtonStyleNormal;
+            GUI.Box(rect, new GUIContent(item.Thumbnail, item.Tooltip), style);
 
             return true;
         }
 
-        protected string SingleSelectDropdown(string label, string selected, List<string> options, GUIStyle style, params GUILayoutOption[] guiOptions)
+        protected string SingleSelectDropdown(string label,
+                                              string selected,
+                                              List<string> options,
+                                              GUIStyle style,
+                                              params GUILayoutOption[] guiOptions)
         {
             if (options.Count == 0)
                 return null;
@@ -247,11 +309,14 @@ namespace IW.EditorExtensions
 
             if (newIndex >= 0 && newIndex < options.Count)
                 return options[newIndex];
-            else
-                return null;
+            return null;
         }
 
-        protected List<string> MultiSelectDropdown(string label, List<string> selected, List<string> options, GUIStyle style, params GUILayoutOption[] guiOptions)
+        protected List<string> MultiSelectDropdown(string label,
+                                                   List<string> selected,
+                                                   List<string> options,
+                                                   GUIStyle style,
+                                                   params GUILayoutOption[] guiOptions)
         {
             if (options == null || options.Count == 0)
                 return new List<string>();
@@ -262,89 +327,21 @@ namespace IW.EditorExtensions
                 selected = new List<string>();
 
             for (int i = 0; i < options.Count; i++)
-            {
                 if (selected.Contains(options[i]))
                     mask |= 1 << i;
-            }
 
             if (label != null)
                 mask = EditorGUILayout.MaskField(label, mask, options.ToArray(), style, guiOptions);
             else
                 mask = EditorGUILayout.MaskField(mask, options.ToArray(), style, guiOptions);
 
-            List<string> newSelected = new List<string>();
+            List<string> newSelected = new();
 
             for (int i = 0; i < options.Count; i++)
-            {
                 if ((mask & (1 << i)) != 0)
                     newSelected.Add(options[i]);
-            }
 
             return newSelected;
-        }
-
-        void ISceneDragReceiver.StartDrag(object data)
-        {
-            isDragging = true;
-
-            if (ghostObject != null)
-                GameObject.DestroyImmediate(ghostObject);
-        }
-
-        void ISceneDragReceiver.StopDrag(object data)
-        {
-            isDragging = false;
-
-            if (ghostObject != null)
-                GameObject.DestroyImmediate(ghostObject);
-        }
-
-        DragAndDropVisualMode ISceneDragReceiver.UpdateDrag(Event evt, EventType eventType, object data)
-        {
-            int index = (int)data;
-            Vector3 mousePosition = Event.current.mousePosition;
-            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
-
-            if (SceneView.lastActiveSceneView == null)
-                return DragAndDropVisualMode.Generic;
-
-            if (ghostObject == null)
-            {
-                ghostObject = CreateGhostPrefab(index);
-                ghostObject.transform.rotation = Quaternion.identity;
-                ghostObject.hideFlags = HideFlags.HideAndDontSave;
-            }
-            Vector3 hitPoint;
-
-            if (Raycast(ray, 1000, ghostObject, out hitPoint))
-                ghostObject.transform.position = hitPoint;
-            else
-                ghostObject.transform.position = ray.origin + ray.direction * 10; 
-
-            return DragAndDropVisualMode.Generic;
-        }
-
-        void ISceneDragReceiver.PerformDrag(Event evt, object data)
-        {
-            isDragging = false;
-
-            int index = (int)data;
-
-            if (SceneView.lastActiveSceneView == null)
-                return;
-
-            Vector3 mousePosition = Event.current.mousePosition;
-            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
-            Vector3 hitPoint;
-
-            if (Raycast(ray, 1000, ghostObject, out hitPoint))
-                OnPlaceInScene(index, hitPoint);
-            else
-                OnPlaceInScene(index, ray.origin + ray.direction * 10);
-
-            if (ghostObject != null)
-                GameObject.DestroyImmediate(ghostObject);
-
         }
 
         private bool Raycast(Ray ray, float distance, GameObject ignoreObject, out Vector3 hitPoint)
@@ -355,9 +352,9 @@ namespace IW.EditorExtensions
             int closestHit = -1;
             float closestDistance = 0;
 
-            for(int i = 0; i < hits.Length; i++)
+            for (int i = 0; i < hits.Length; i++)
             {
-                if(ignoreObject != null)
+                if (ignoreObject != null)
                 {
                     if (hits[i].collider.gameObject == ignoreObject)
                         continue;
@@ -365,28 +362,29 @@ namespace IW.EditorExtensions
                     Transform test = hits[i].collider.transform;
                     bool isChild = false;
 
-                    while(test.parent != null)
+                    while (test.parent != null)
                     {
                         if (test.parent == ignoreObject.transform)
                         {
                             isChild = true;
                             break;
                         }
+
                         test = test.parent;
                     }
 
                     if (isChild)
                         continue;
                 }
-                
-                if(closestHit == -1 || Vector3.Distance(hits[i].point,ray.origin) < closestDistance)
+
+                if (closestHit == -1 || Vector3.Distance(hits[i].point, ray.origin) < closestDistance)
                 {
                     closestDistance = Vector3.Distance(hits[i].point, ray.origin);
                     closestHit = i;
                 }
             }
 
-            if(closestHit == -1)
+            if (closestHit == -1)
             {
                 hitPoint = Vector3.zero;
                 return false;
@@ -399,13 +397,18 @@ namespace IW.EditorExtensions
 
         public static Texture2D CreatePixelTexture(Color color)
         {
-            Texture2D tex = new Texture2D(1, 1);
+            Texture2D tex = new(1, 1);
             tex.SetPixel(0, 0, color);
             tex.Apply();
             return tex;
         }
 
 
+        protected struct LibraryItem
+        {
+            public Texture2D Thumbnail;
+            public string Tooltip;
+            public bool IsSelected;
+        }
     }
 }
- 

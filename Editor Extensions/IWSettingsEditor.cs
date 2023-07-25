@@ -3,8 +3,8 @@ using UnityEditor;
 
 namespace IW.EditorExtensions
 {
-    [CustomEditor(typeof(IWSettings))]
-    public class IWSettingsEditor : Editor
+    [CustomEditor(typeof(IwSettings))]
+    public class IwSettingsEditor : Editor
     {
         private SerializedProperty[] m_dependencyProperties;
         

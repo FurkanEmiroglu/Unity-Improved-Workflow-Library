@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace IW.EditorExtensions
 {
-    public sealed class IwSettings : ScriptableObject
+    public sealed class IWSettings : ScriptableObject
     {
         public bool _doTweenIncluded;
         public bool _rayfireIncluded;

@@ -4,14 +4,14 @@ using static IW.EditorExtensions.ImprovedWorkflowConstants;
 
 namespace IW.EditorExtensions
 {
-    public class IwManager : EditorWindow
+    public class IWManager : EditorWindow
     {
         #region Opener
 
         [MenuItem("Tools/Workflow/Preferences", default, 3000)]
         private static void ShowWindow()
         {
-            var window = GetWindow<IwManager>();
+            var window = GetWindow<IWManager>();
             window.titleContent = new GUIContent("Improved Workflow Settings");
             window.Show();
         }
@@ -29,7 +29,7 @@ namespace IW.EditorExtensions
 
         private void OnEnable()
         {
-            m_workflowSettings = Resources.Load("WorkflowSettings") as IwSettings;
+            m_workflowSettings = Resources.Load("WorkflowSettings") as IWSettings;
             m_workflowSettings ??= CreateSettingsAsset();
             m_workflowSettingsEditor = Editor.CreateEditor(m_workflowSettings);
             
@@ -50,9 +50,9 @@ namespace IW.EditorExtensions
                 m_prefabLibrarySettingsEditor.OnInspectorGUI();
         }
         
-        private static IwSettings CreateSettingsAsset()
+        private static IWSettings CreateSettingsAsset()
         {
-            IwSettings settings = CreateInstance<IwSettings>();
+            IWSettings settings = CreateInstance<IWSettings>();
             // path has to start at "Assets"
             string path = SETTINGS_PATH;
             AssetDatabase.CreateAsset(settings, path);

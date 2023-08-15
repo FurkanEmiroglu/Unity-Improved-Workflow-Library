@@ -44,7 +44,7 @@ namespace IW.EditorExtensions
 
         private static bool GetAnyNameSpaceContains(string @namespace)
         {
-            IwSettings settings = Resources.Load("WorkflowSettings") as IwSettings;
+            IWSettings settings = Resources.Load("WorkflowSettings") as IWSettings;
 
             foreach (string s in settings._scriptableCreatorNamespaces)
             {

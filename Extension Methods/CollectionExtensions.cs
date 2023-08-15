@@ -115,7 +115,7 @@ namespace IW.ExtensionMethods
         /// </summary>
         /// <param name="list"></param>
         /// <typeparam name="T"></typeparam>
-        public static void Shuffle<T>(IList<T> list)
+        public static void Shuffle<T>(this IList<T> list)
         {
             System.Random rng = new();
             int n = list.Count;

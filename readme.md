@@ -26,3 +26,4 @@ add the following entry to the Scoped Registries list:
 
 Now you can install the package from My Registries page in the Package Manager
 window.
+

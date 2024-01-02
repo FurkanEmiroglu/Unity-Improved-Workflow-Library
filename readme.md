@@ -5,6 +5,7 @@ This package uses the [scoped registry] feature to resolve package
 dependencies. Open the Package Manager page in the Project Settings window and
 add the following entry to the Scoped Registries list:
 
+
 ### 1. Open Edit / Project Settings in Unity
 ![Project Settings](https://raw.githubusercontent.com/FurkanEmiroglu/FurkanEmiroglu/main/Project%20Settings.jpg)
 

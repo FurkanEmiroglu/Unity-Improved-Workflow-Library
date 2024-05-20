@@ -82,15 +82,4 @@ namespace IW.EditorExtensions
             PlayerPrefs.DeleteAll();
             Debug.Log("Cleared all player prefs");
         }
-        
-#if UNITY_EDITOR_WIN
-        [MenuItem("Tools/Workflow/Editor Shortcuts/Object Preview #a")]
-#elif UNITY_EDITOR_OSX
-        [MenuItem("Tools/Workflow/Editor Shortcuts/Object Preview #a")]
-#endif
-        public static void OpenPreview()
-        {
-            ObjectPreviewer.Init();
-        }
-    }
 }

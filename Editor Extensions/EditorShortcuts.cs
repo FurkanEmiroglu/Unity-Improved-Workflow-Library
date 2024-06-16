@@ -82,4 +82,5 @@ namespace IW.EditorExtensions
             PlayerPrefs.DeleteAll();
             Debug.Log("Cleared all player prefs");
         }
+    }
 }
